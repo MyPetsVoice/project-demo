@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}반려동물 등록 - PetCare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-paw text-primary"></i> 반려동물 등록</h3>
+                <p class="text-muted mb-0">새로운 가족을 소개해주세요!</p>
+            </div>
+            <div class="card-body">
+                <form id="addPetForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">기본 정보</h5>
+                            
+                            <div class="mb-3">
+                                <label for="name" class="form-label">이름 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="species" class="form-label">동물 종류 <span class="text-danger">*</span></label>
+                                <select class="form-select" id="species" name="species" required>
+                                    <option value="">선택해주세요</option>
+                                    <option value="강아지">강아지</option>
+                                    <option value="고양이">고양이</option>
+                                    <option value="햄스터">햄스터</option>
+                                    <option value="토끼">토끼</option>
+                                    <option value="새">새</option>
+                                    <option value="기타">기타</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="breed" class="form-label">품종</label>
+                                <input type="text" class="form-control" id="breed" name="breed">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">성별</label>
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="">선택해주세요</option>
+                                    <option value="수컷">수컷</option>
+                                    <option value="암컷">암컷</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_neutered" name="is_neutered">
+                                    <label class="form-check-label" for="is_neutered">
+                                        중성화 수술을 받았어요
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h5 class="mb-3">AI 채팅 설정</h5>
+                            
+                            <div class="mb-3">
+                                <label for="personality" class="form-label">성격</label>
+                                <textarea class="form-control" id="personality" name="personality" rows="3" placeholder="예: 활발하고 장난기 많은 성격, 사람을 좋아함"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="speaking_style" class="form-label">말투</label>
+                                <input type="text" class="form-control" id="speaking_style" name="speaking_style" placeholder="예: 귀엽고 애교 많은 말투">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="user_nickname" class="form-label">주인 호칭</label>
+                                <input type="text" class="form-control" id="user_nickname" name="user_nickname" placeholder="예: 엄마, 아빠, 주인님">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="likes" class="form-label">좋아하는 것</label>
+                                <textarea class="form-control" id="likes" name="likes" rows="2" placeholder="예: 산책, 간식, 놀이"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="dislikes" class="form-label">싫어하는 것</label>
+                                <textarea class="form-control" id="dislikes" name="dislikes" rows="2" placeholder="예: 목욕, 큰 소리"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="habits" class="form-label">습관 및 특징</label>
+                                <textarea class="form-control" id="habits" name="habits" rows="3" placeholder="예: 아침마다 주인을 깨우는 습관, 특정 장난감을 좋아함"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('pets') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> 취소
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 등록하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('addPetForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+        data[key] = value;
+    }
+    
+    // 중성화 체크박스 처리
+    data.is_neutered = document.getElementById('is_neutered').checked;
+    
+    try {
+        const response = await fetch('/pets/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(result.message);
+            window.location.href = result.redirect;
+        } else {
+            alert(result.error || '등록 중 오류가 발생했습니다.');
+        }
+    } catch (error) {
+        alert('등록 중 오류가 발생했습니다.');
+        console.error('Error:', error);
+    }
+});
+</script>
+{% endblock %}

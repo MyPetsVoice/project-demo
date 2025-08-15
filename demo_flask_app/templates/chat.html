@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pet.name }}와 대화 - PetCare{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        {% if pet.profile_image %}
+                            <img src="{{ pet.profile_image }}" alt="{{ pet.name }}" class="rounded-circle" width="50" height="50">
+                        {% else %}
+                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fas fa-paw text-primary"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="mb-0">{{ pet.name }}</h5>
+                        <small>{{ pet.species }} • {{ pet.personality or '즐거운 대화를 나누어요!' }}</small>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button class="btn btn-outline-light btn-sm" onclick="clearChat()">
+                            <i class="fas fa-broom"></i> 대화 초기화
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body p-0">
+                <div id="chatContainer" class="chat-container">
+                    <div class="chat-message ai">
+                        <div class="chat-bubble ai">
+                            <strong>{{ pet.name }}:</strong> 
+                            안녕! {{ pet.user_nickname or '주인' }}! 
+                            나는 {{ pet.name }}이야! 오늘은 뭐 하고 놀까? 🐾
+                        </div>
+                        <small class="text-muted ms-2">방금 전</small>
+                    </div>
+                </div>
+                
+                <div class="p-3 border-top">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="messageInput" placeholder="{{ pet.name }}에게 메시지를 보내세요..." maxlength="500">
+                        <button class="btn btn-primary" type="button" id="sendButton" onclick="sendMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-lightbulb"></i> 
+                            팁: "오늘 뭐했어?", "산책 가자!", "기분이 어때?" 같은 질문을 해보세요.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 반려동물 정보 카드 -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-info-circle text-info"></i> {{ pet.name }} 정보</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>종류:</strong> {{ pet.species }}</p>
+                        {% if pet.breed %}
+                        <p><strong>품종:</strong> {{ pet.breed }}</p>
+                        {% endif %}
+                        {% if pet.gender %}
+                        <p><strong>성별:</strong> {{ pet.gender }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if pet.speaking_style %}
+                        <p><strong>말투:</strong> {{ pet.speaking_style }}</p>
+                        {% endif %}
+                        {% if pet.likes %}
+                        <p><strong>좋아하는 것:</strong> {{ pet.likes }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 로딩 모달 -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loading-spinner mb-3"></div>
+                <p>{{ pet.name }}이 생각 중이에요...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const petId = {{ pet.id }};
+const petName = "{{ pet.name }}";
+
+// 엔터키로 메시지 전송
+document.getElementById('messageInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendMessage();
+    }
+});
+
+async function sendMessage() {
+    const messageInput = document.getElementById('messageInput');
+    const message = messageInput.value.trim();
+    
+    if (!message) return;
+    
+    // 사용자 메시지 추가
+    addMessage('user', message, '방금 전');
+    messageInput.value = '';
+    
+    // 로딩 표시
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    loadingModal.show();
+    
+    try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                pet_id: petId,
+                message: message
+            })
+        });
+        
+        const result = await response.json();
+        loadingModal.hide();
+        
+        if (response.ok) {
+            // AI 응답 추가
+            addMessage('ai', result.response, '방금 전');
+        } else {
+            addMessage('ai', '죄송해요, 지금 대답하기 어려워요. 조금 후에 다시 시도해주세요. 😔', '방금 전');
+        }
+    } catch (error) {
+        loadingModal.hide();
+        addMessage('ai', '네트워크 오류가 발생했어요. 인터넷 연결을 확인해주세요. 🌐', '방금 전');
+        console.error('Error:', error);
+    }
+}
+
+function addMessage(type, content, time) {
+    const chatContainer = document.getElementById('chatContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${type} fade-in-up`;
+    
+    const isUser = type === 'user';
+    const bubbleClass = isUser ? 'chat-bubble user' : 'chat-bubble ai';
+    const prefix = isUser ? '나: ' : `${petName}: `;
+    
+    messageDiv.innerHTML = `
+        <div class="${bubbleClass}">
+            <strong>${prefix}</strong> ${content}
+        </div>
+        <small class="text-muted ${isUser ? 'me-2' : 'ms-2'}">${time}</small>
+    `;
+    
+    chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function clearChat() {
+    if (confirm('대화 내용을 모두 삭제하시겠습니까?')) {
+        const chatContainer = document.getElementById('chatContainer');
+        const messages = chatContainer.querySelectorAll('.chat-message');
+        
+        // 첫 번째 환영 메시지를 제외하고 모두 삭제
+        for (let i = 1; i < messages.length; i++) {
+            messages[i].remove();
+        }
+    }
+}
+
+// 페이지 로드 시 채팅 컨테이너 스크롤을 맨 아래로
+document.addEventListener('DOMContentLoaded', function() {
+    const chatContainer = document.getElementById('chatContainer');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+});
+</script>
+{% endblock %}

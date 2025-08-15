@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}반려동물 장소 찾기 - PetCare{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-map-marker-alt text-warning"></i> 반려동물 장소 찾기</h2>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <select class="form-select" id="categoryFilter">
+                    <option value="">전체 카테고리</option>
+                    <option value="병원">🏥 동물병원</option>
+                    <option value="카페">☕ 애견카페</option>
+                    <option value="공원">🌳 공원</option>
+                    <option value="펜션">🏠 펜션</option>
+                    <option value="용품점">🛍️ 용품점</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="searchInput" 
+                           placeholder="장소명이나 지역으로 검색...">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-warning w-100" onclick="searchPlaces()">
+                    <i class="fas fa-search"></i> 검색
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 지도 영역 -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-map text-primary"></i> 지도</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="map-container bg-light d-flex align-items-center justify-content-center">
+            <div class="text-center">
+                <i class="fas fa-map fa-3x text-muted mb-3"></i>
+                <p class="text-muted">카카오맵 API 연동 예정</p>
+                <p class="text-muted small">실제 서비스에서는 여기에 지도가 표시됩니다</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 장소 목록 -->
+<div class="row" id="placesList">
+    <!-- 샘플 장소 데이터 -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title">행복한 동물병원</h6>
+                    <span class="badge bg-danger">🏥 병원</span>
+                </div>
+                <p class="text-muted small mb-2">서울시 강남구 테헤란로 123</p>
+                <p class="text-muted small mb-3">⭐ 4.5 (리뷰 127개)</p>
+                <p class="card-text small">친절한 진료와 합리적인 가격으로 유명한 동물병원입니다.</p>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary" onclick="showOnMap(1)">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="showReviews(1)">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-sm btn-warning" onclick="viewPlaceDetail(1)">
+                        상세보기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title">멍멍이 카페</h6>
+                    <span class="badge bg-warning">☕ 카페</span>
+                </div>
+                <p class="text-muted small mb-2">서울시 홍대 와우산로 456</p>
+                <p class="text-muted small mb-3">⭐ 4.2 (리뷰 89개)</p>
+                <p class="card-text small">반려동물과 함께 즐길 수 있는 아늑한 카페입니다.</p>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary" onclick="showOnMap(2)">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="showReviews(2)">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-sm btn-warning" onclick="viewPlaceDetail(2)">
+                        상세보기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title">중앙공원</h6>
+                    <span class="badge bg-success">🌳 공원</span>
+                </div>
+                <p class="text-muted small mb-2">서울시 강남구 중앙대로 789</p>
+                <p class="text-muted small mb-3">⭐ 4.7 (리뷰 234개)</p>
+                <p class="card-text small">넓은 잔디밭에서 반려동물과 자유롭게 뛰어놀 수 있습니다.</p>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary" onclick="showOnMap(3)">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="showReviews(3)">
+                            <i class="fas fa-star"></i>
+                        </button>
+                    </div>
+                    <button class="btn btn-sm btn-warning" onclick="viewPlaceDetail(3)">
+                        상세보기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center">
+    <p class="text-muted">카카오맵 API 연동 후 실제 장소 데이터가 표시됩니다</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function searchPlaces() {
+    const category = document.getElementById('categoryFilter').value;
+    const keyword = document.getElementById('searchInput').value;
+    
+    alert(`검색 기능은 추후 구현 예정입니다.\n카테고리: ${category || '전체'}\n키워드: ${keyword || '없음'}`);
+}
+
+function showOnMap(placeId) {
+    alert('지도에 표시 기능은 카카오맵 API 연동 후 구현 예정입니다.');
+}
+
+function showReviews(placeId) {
+    alert('리뷰 보기 기능은 추후 구현 예정입니다.');
+}
+
+function viewPlaceDetail(placeId) {
+    alert('장소 상세보기 기능은 추후 구현 예정입니다.');
+}
+</script>
+{% endblock %}

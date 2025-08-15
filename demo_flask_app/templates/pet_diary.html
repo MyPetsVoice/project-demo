@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pet.name }}의 일기장 - PetCare{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+        <div class="flex-shrink-0 me-3">
+            {% if pet.profile_image %}
+                <img src="{{ pet.profile_image }}" alt="{{ pet.name }}" class="rounded-circle" width="60" height="60">
+            {% else %}
+                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="fas fa-paw text-white fa-2x"></i>
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <h2 class="mb-0">{{ pet.name }}의 일기장</h2>
+            <p class="text-muted mb-0">{{ pet.species }} • 총 {{ diaries|length }}개의 일기</p>
+        </div>
+    </div>
+    
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('write_diary', pet_id=pet.id) }}" class="btn btn-success">
+            <i class="fas fa-edit"></i> 새 일기 작성
+        </a>
+        <a href="{{ url_for('diary_list') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> 돌아가기
+        </a>
+    </div>
+</div>
+
+{% if diaries %}
+<!-- 필터 및 정렬 옵션 -->
+<div class="card mb-4">
+    <div class="card-body py-3">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="searchInput" 
+                           placeholder="일기 제목이나 내용으로 검색...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="sortSelect">
+                    <option value="newest">최신순</option>
+                    <option value="oldest">오래된순</option>
+                    <option value="title">제목순</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="filterSelect">
+                    <option value="all">전체 일기</option>
+                    <option value="public">공개 일기</option>
+                    <option value="private">비공개 일기</option>
+                    <option value="bookmarked">북마크한 일기</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 일기 목록 -->
+<div id="diaryGrid" class="row">
+    {% for diary in diaries %}
+    <div class="col-md-6 col-lg-4 mb-4 diary-item" 
+         data-title="{{ diary.title|lower }}" 
+         data-content="{{ diary.content|lower }}"
+         data-public="{{ diary.is_public|lower }}"
+         data-bookmarked="{{ diary.is_bookmarked|lower }}"
+         data-date="{{ diary.created_at.isoformat() }}">
+        
+        <div class="card diary-card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <span class="me-2">{{ diary.weather }}</span>
+                    <small class="text-muted">{{ diary.created_at.strftime('%Y.%m.%d') }}</small>
+                </div>
+                <div class="d-flex align-items-center">
+                    {% if diary.is_public %}
+                        <i class="fas fa-globe text-info me-2" title="공개 일기"></i>
+                    {% else %}
+                        <i class="fas fa-lock text-muted me-2" title="비공개 일기"></i>
+                    {% endif %}
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="viewDiary({{ diary.id }})">
+                                <i class="fas fa-eye"></i> 상세보기
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="toggleBookmark({{ diary.id }})">
+                                <i class="fas fa-bookmark"></i> 
+                                {% if diary.is_bookmarked %}북마크 해제{% else %}북마크{% endif %}
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="shareDiary({{ diary.id }})">
+                                <i class="fas fa-share"></i> 공유
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="deleteDiary({{ diary.id }}, '{{ diary.title }}')">
+                                <i class="fas fa-trash"></i> 삭제
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <h6 class="card-title">{{ diary.title }}</h6>
+                <p class="card-text">{{ diary.content[:150] }}{% if diary.content|length > 150 %}...{% endif %}</p>
+                
+                {% if diary.photos %}
+                <div class="mb-2">
+                    <small class="text-muted">
+                        <i class="fas fa-images"></i> 사진 포함
+                    </small>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-footer bg-transparent">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        {% if diary.is_public %}
+                        <button class="btn btn-sm btn-outline-danger like-btn" onclick="toggleLike('diary', {{ diary.id }})">
+                            <i class="far fa-heart"></i> <span class="like-count">{{ diary.likes }}</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                    <button class="btn btn-sm btn-primary" onclick="viewDiary({{ diary.id }})">
+                        <i class="fas fa-book-open"></i> 읽기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- 검색 결과가 없을 때 -->
+<div id="noResultsMessage" class="text-center py-5 d-none">
+    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+    <h5 class="text-muted">검색 결과가 없습니다</h5>
+    <p class="text-muted">다른 키워드로 검색해보세요.</p>
+</div>
+
+{% else %}
+<!-- 일기가 없을 때 -->
+<div class="text-center py-5">
+    <i class="fas fa-book fa-4x text-muted mb-4"></i>
+    <h3 class="text-muted">{{ pet.name }}의 첫 번째 일기를 작성해보세요!</h3>
+    <p class="text-muted mb-4">AI가 {{ pet.name }}의 마음을 담아 특별한 일기를 만들어드릴게요.</p>
+    <a href="{{ url_for('write_diary', pet_id=pet.id) }}" class="btn btn-success btn-lg">
+        <i class="fas fa-edit"></i> 첫 번째 일기 작성하기
+    </a>
+</div>
+{% endif %}
+
+<!-- 일기 상세보기 모달 -->
+<div class="modal fade" id="diaryDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="diaryDetailTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="diaryDetailContent">
+                <!-- 동적으로 로드될 내용 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-primary" onclick="editCurrentDiary()">수정</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentDiaryId = null;
+
+// 검색 기능
+document.getElementById('searchInput').addEventListener('input', PetCare.debounce(function() {
+    filterAndSortDiaries();
+}, 300));
+
+// 정렬 기능
+document.getElementById('sortSelect').addEventListener('change', function() {
+    filterAndSortDiaries();
+});
+
+// 필터 기능
+document.getElementById('filterSelect').addEventListener('change', function() {
+    filterAndSortDiaries();
+});
+
+function filterAndSortDiaries() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const sortBy = document.getElementById('sortSelect').value;
+    const filterBy = document.getElementById('filterSelect').value;
+    
+    const diaryItems = Array.from(document.querySelectorAll('.diary-item'));
+    let visibleCount = 0;
+    
+    // 필터링
+    diaryItems.forEach(item => {
+        const title = item.getAttribute('data-title');
+        const content = item.getAttribute('data-content');
+        const isPublic = item.getAttribute('data-public') === 'true';
+        const isBookmarked = item.getAttribute('data-bookmarked') === 'true';
+        
+        let showItem = true;
+        
+        // 검색어 필터
+        if (searchTerm && !title.includes(searchTerm) && !content.includes(searchTerm)) {
+            showItem = false;
+        }
+        
+        // 타입 필터
+        if (filterBy === 'public' && !isPublic) {
+            showItem = false;
+        } else if (filterBy === 'private' && isPublic) {
+            showItem = false;
+        } else if (filterBy === 'bookmarked' && !isBookmarked) {
+            showItem = false;
+        }
+        
+        if (showItem) {
+            item.style.display = 'block';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    // 정렬
+    const visibleItems = diaryItems.filter(item => item.style.display !== 'none');
+    visibleItems.sort((a, b) => {
+        if (sortBy === 'newest') {
+            return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+        } else if (sortBy === 'oldest') {
+            return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+        } else if (sortBy === 'title') {
+            return a.getAttribute('data-title').localeCompare(b.getAttribute('data-title'));
+        }
+    });
+    
+    // DOM 재배치
+    const container = document.getElementById('diaryGrid');
+    visibleItems.forEach(item => {
+        container.appendChild(item);
+    });
+    
+    // 검색 결과 없음 메시지
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    if (visibleCount === 0) {
+        noResultsMessage.classList.remove('d-none');
+    } else {
+        noResultsMessage.classList.add('d-none');
+    }
+}
+
+function viewDiary(diaryId) {
+    currentDiaryId = diaryId;
+    
+    // 실제로는 API를 호출해서 일기 상세 정보를 가져와야 함
+    // 여기서는 데모용 임시 데이터
+    const modal = new bootstrap.Modal(document.getElementById('diaryDetailModal'));
+    document.getElementById('diaryDetailTitle').textContent = '일기 제목';
+    document.getElementById('diaryDetailContent').innerHTML = `
+        <div class="text-center mb-4">
+            <h4>샘플 일기 제목</h4>
+            <p class="text-muted">
+                <i class="fas fa-calendar"></i> 2024.01.15 
+                <span class="ms-3">☀️ 맑음</span>
+            </p>
+        </div>
+        <div style="line-height: 1.8;">
+            <p>오늘은 정말 신나는 하루였어! 아침에 엄마가 나를 깨우자마자 꼬리가 저절로 흔들렸지 뭐야! 🐕</p>
+            <p>공원에 가서 다른 강아지 친구들과 신나게 뛰어놀았어. 특히 골든 리트리버 친구랑 술래잡기를 했는데 너무 재밌었어!</p>
+            <p>엄마가 새로운 장난감도 사주셨어. 삑삑 소리가 나는 공이야! 온종일 물고 다니면서 놀았지 히히 😊</p>
+        </div>
+    `;
+    modal.show();
+}
+
+function toggleBookmark(diaryId) {
+    // 북마크 토글 API 호출 (추후 구현)
+    alert('북마크 기능은 추후 구현 예정입니다.');
+}
+
+function shareDiary(diaryId) {
+    // 일기 공유 기능 (추후 구현)
+    alert('공유 기능은 추후 구현 예정입니다.');
+}
+
+function deleteDiary(diaryId, title) {
+    if (confirm(`정말로 "${title}" 일기를 삭제하시겠습니까?`)) {
+        // 일기 삭제 API 호출 (추후 구현)
+        alert('일기 삭제 기능은 추후 구현 예정입니다.');
+    }
+}
+
+function editCurrentDiary() {
+    if (currentDiaryId) {
+        alert('일기 수정 기능은 추후 구현 예정입니다.');
+    }
+}
+
+function toggleLike(type, id) {
+    // 좋아요 토글 기능
+    PetCare.toggleLike(type, id);
+}
+
+// 페이지 로드 시 초기 정렬 적용
+document.addEventListener('DOMContentLoaded', function() {
+    filterAndSortDiaries();
+});
+</script>
+{% endblock %}
