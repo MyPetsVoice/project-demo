@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triple T - 반려동물 AI 케어 서비스</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bright-yellow': '#FFD700',
+                        'bright-yellow-light': '#FFF700',
+                        'bright-yellow-dark': '#FFB700'
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-yellow-100 to-yellow-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="/" class="text-2xl font-bold text-yellow-500 hover:text-yellow-600 transition-colors">
+                        <i class="fas fa-paw mr-2 animate-bounce-slow"></i>Triple T
+                    </a>
+                </div>
+
+                <!-- Weather and Auth Section -->
+                <div class="flex items-center space-x-6">
+                    <!-- Weather Info -->
+                    <div id="weather-info" class="flex items-center text-sm text-gray-700 bg-gray-100 rounded-lg px-3 py-2 transition-all duration-300">
+                        <i class="fas fa-cloud-sun mr-2 text-yellow-500"></i>
+                        <span id="weather-temp">--°C</span>
+                        <span id="weather-desc" class="ml-2 text-gray-600">날씨 로딩중...</span>
+                    </div>
+
+                    <!-- Auth Buttons -->
+                    <div class="flex items-center space-x-2">
+                        <button id="login-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105">
+                            로그인
+                        </button>
+                        <button id="logout-btn" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105 hidden">
+                            로그아웃
+                        </button>
+                    </div>
+
+                    <!-- My Page -->
+                    <a href="/mypage" class="flex items-center text-gray-700 hover:text-yellow-500 transition-colors duration-300">
+                        <i class="fas fa-user-circle text-2xl"></i>
+                        <span class="ml-1 text-sm">마이페이지</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Bar -->
+    <nav class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-800 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-center space-x-8 py-3 overflow-x-auto">
+                <a href="/community" class="flex items-center px-4 py-2 rounded-lg hover:bg-yellow-300 transition-all duration-300 font-medium whitespace-nowrap transform hover:scale-105">
+                    <i class="fas fa-users mr-2"></i>
+                    <span>커뮤니티</span>
+                </a>
+                <a href="/pet-info" class="flex items-center px-4 py-2 rounded-lg hover:bg-yellow-300 transition-all duration-300 font-medium whitespace-nowrap transform hover:scale-105">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <span>반려동물 정보</span>
+                </a>
+                <a href="/ai-chat" class="flex items-center px-4 py-2 rounded-lg hover:bg-yellow-300 transition-all duration-300 font-medium whitespace-nowrap transform hover:scale-105">
+                    <i class="fas fa-comments mr-2"></i>
+                    <span>AI 대화</span>
+                </a>
+                <a href="/diary" class="flex items-center px-4 py-2 rounded-lg hover:bg-yellow-300 transition-all duration-300 font-medium whitespace-nowrap transform hover:scale-105">
+                    <i class="fas fa-book mr-2"></i>
+                    <span>일기작성</span>
+                </a>
+                <a href="/care-schedule" class="flex items-center px-4 py-2 rounded-lg hover:bg-yellow-300 transition-all duration-300 font-medium whitespace-nowrap transform hover:scale-105">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    <span>케어 일정</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Left Content (3/4) -->
+            <div class="lg:col-span-3">
+                <!-- Advertisement Section -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6 overflow-hidden relative">
+                    <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white rounded-xl p-8 text-center relative z-10">
+                        <h2 class="text-3xl font-bold mb-4 animate-pulse-slow">🐾 AI와 함께하는 스마트 펫케어</h2>
+                        <p class="text-lg mb-4 font-medium">반려동물과 대화하고, 건강을 관리하며, 추억을 기록하세요</p>
+                        <button onclick="startService()" class="bg-white text-yellow-500 font-bold px-8 py-3 rounded-lg hover:bg-gray-50 transition-all duration-300 shadow-md transform hover:scale-110">
+                            지금 시작하기
+                        </button>
+                    </div>
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-300 opacity-20 rounded-full -mr-16 -mt-16"></div>
+                    <div class="absolute bottom-0 left-0 w-24 h-24 bg-yellow-600 opacity-20 rounded-full -ml-12 -mb-12"></div>
+                </div>
+
+                <!-- Main Features -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">🐕 반려동물과 함께하는 특별한 시간 🐱</h1>
+                    
+                    <!-- Feature Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 hover:shadow-xl transition-all duration-300 border border-blue-200 transform hover:scale-105">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-blue-500 rounded-full p-3 mr-4 shadow-lg">
+                                    <i class="fas fa-robot text-white text-xl"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-800">AI 대화</h3>
+                            </div>
+                            <p class="text-gray-600 mb-4">생성형 AI를 통해 반려동물의 마음을 이해하고 대화해보세요</p>
+                            <button onclick="startAIChat()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105">
+                                대화 시작하기
+                            </button>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 hover:shadow-xl transition-all duration-300 border border-green-200 transform hover:scale-105">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-green-500 rounded-full p-3 mr-4 shadow-lg">
+                                    <i class="fas fa-book-open text-white text-xl"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-800">AI 일기 작성</h3>
+                            </div>
+                            <p class="text-gray-600 mb-4">반려동물의 하루를 AI가 대신 기록해주는 특별한 일기</p>
+                            <button onclick="navigateToPage('/diary')" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105">
+                                일기 보기
+                            </button>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl p-6 hover:shadow-xl transition-all duration-300 border border-yellow-300 transform hover:scale-105">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-yellow-500 rounded-full p-3 mr-4 shadow-lg">
+                                    <i class="fas fa-heart text-white text-xl"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-800">건강 케어</h3>
+                            </div>
+                            <p class="text-gray-600 mb-4">예방접종, 건강검진, 약물복용 등 체계적인 건강 관리</p>
+                            <button onclick="navigateToPage('/care-schedule')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105">
+                                케어 관리
+                            </button>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 hover:shadow-xl transition-all duration-300 border border-orange-200 transform hover:scale-105">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-orange-500 rounded-full p-3 mr-4 shadow-lg">
+                                    <i class="fas fa-users text-white text-xl"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-800">커뮤니티</h3>
+                            </div>
+                            <p class="text-gray-600 mb-4">다른 반려동물 가족들과 경험과 정보를 공유하세요</p>
+                            <button onclick="navigateToPage('/community')" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105">
+                                커뮤니티 참여
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-star mr-2 text-yellow-500"></i>
+                        오늘의 추천 활동
+                    </h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div onclick="recordPhoto()" class="bg-yellow-100 rounded-lg p-4 text-center hover:bg-yellow-200 transition-all duration-300 cursor-pointer border border-yellow-300 transform hover:scale-105">
+                            <i class="fas fa-camera text-3xl text-yellow-600 mb-3"></i>
+                            <p class="text-sm font-medium text-gray-800">사진 등록</p>
+                            <p class="text-xs text-gray-600 mt-1">오늘의 모습</p>
+                        </div>
+                        <div onclick="recordMeal()" class="bg-pink-50 rounded-lg p-4 text-center hover:bg-pink-100 transition-all duration-300 cursor-pointer border border-pink-200 transform hover:scale-105">
+                            <i class="fas fa-utensils text-3xl text-pink-600 mb-3"></i>
+                            <p class="text-sm font-medium text-gray-800">식사 기록</p>
+                            <p class="text-xs text-gray-600 mt-1">먹이 시간</p>
+                        </div>
+                        <div onclick="recordWalk()" class="bg-indigo-50 rounded-lg p-4 text-center hover:bg-indigo-100 transition-all duration-300 cursor-pointer border border-indigo-200 transform hover:scale-105">
+                            <i class="fas fa-running text-3xl text-indigo-600 mb-3"></i>
+                            <p class="text-sm font-medium text-gray-800">산책 기록</p>
+                            <p class="text-xs text-gray-600 mt-1">활동량 체크</p>
+                        </div>
+                        <div onclick="healthCheck()" class="bg-teal-50 rounded-lg p-4 text-center hover:bg-teal-100 transition-all duration-300 cursor-pointer border border-teal-200 transform hover:scale-105">
+                            <i class="fas fa-stethoscope text-3xl text-teal-600 mb-3"></i>
+                            <p class="text-sm font-medium text-gray-800">건강 체크</p>
+                            <p class="text-xs text-gray-600 mt-1">컨디션 확인</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar (1/4) -->
+            <div class="lg:col-span-1">
+                <!-- Pet Profile Card -->
+                <div id="pet-profile" class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
+                            <i class="fas fa-paw text-3xl text-white animate-pulse"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 mb-2">내 반려동물 등록</h3>
+                        <p class="text-sm text-gray-600 mb-4">반려동물 정보를 등록하고 관리해보세요</p>
+                        <button onclick="registerPet()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105">
+                            + 반려동물 등록
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Today's Schedule -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-calendar-day mr-2 text-yellow-500"></i>
+                        오늘의 일정
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400 transition-all duration-300 hover:bg-blue-100">
+                            <span class="text-gray-700 font-medium">🍽️ 아침 식사</span>
+                            <span class="text-blue-600 text-xs font-bold">08:00</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg border-l-4 border-green-400 transition-all duration-300 hover:bg-green-100">
+                            <span class="text-gray-700 font-medium">🚶 산책 시간</span>
+                            <span class="text-green-600 text-xs font-bold">10:00</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-orange-50 rounded-lg border-l-4 border-orange-400 transition-all duration-300 hover:bg-orange-100">
+                            <span class="text-gray-700 font-medium">💊 약물 복용</span>
+                            <span class="text-orange-600 text-xs font-bold">14:00</span>
+                        </div>
+                    </div>
+                    <button onclick="navigateToPage('/care-schedule')" class="w-full mt-4 text-yellow-500 hover:text-yellow-600 text-sm font-bold transition-colors duration-300">
+                        전체 일정 보기 →
+                    </button>
+                </div>
+
+                <!-- Recent AI Chat -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-comment-dots mr-2 text-yellow-500"></i>
+                        최근 AI 대화
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="bg-yellow-100 rounded-lg p-3 text-sm border-l-4 border-yellow-400 transition-all duration-300 hover:bg-yellow-200">
+                            <p class="text-gray-800 font-medium">🐕 "오늘 산책 가고 싶어요!"</p>
+                            <p class="text-gray-600 text-xs mt-1">5분 전</p>
+                        </div>
+                        <div class="bg-yellow-50 rounded-lg p-3 text-sm border-l-4 border-yellow-300 transition-all duration-300 hover:bg-yellow-100">
+                            <p class="text-gray-800 font-medium">🐱 "간식이 먹고 싶다냥~"</p>
+                            <p class="text-gray-600 text-xs mt-1">1시간 전</p>
+                        </div>
+                    </div>
+                    <button onclick="startAIChat()" class="w-full mt-4 bg-yellow-200 hover:bg-yellow-300 text-yellow-800 font-semibold py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105">
+                        대화 계속하기
+                    </button>
+                </div>
+
+                <!-- Community Updates -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-fire mr-2 text-red-500"></i>
+                        커뮤니티 인기글
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="border-l-4 border-yellow-500 pl-3 py-2 hover:bg-gray-50 transition-colors duration-300 cursor-pointer">
+                            <p class="text-gray-800 font-medium">강아지 훈련 꿀팁 공유</p>
+                            <p class="text-gray-500 text-xs flex items-center mt-1">
+                                <i class="fas fa-comments mr-1"></i>댓글 24개
+                            </p>
+                        </div>
+                        <div class="border-l-4 border-yellow-400 pl-3 py-2 hover:bg-gray-50 transition-colors duration-300 cursor-pointer">
+                            <p class="text-gray-800 font-medium">고양이 건강식 레시피</p>
+                            <p class="text-gray-500 text-xs flex items-center mt-1">
+                                <i class="fas fa-comments mr-1"></i>댓글 18개
+                            </p>
+                        </div>
+                        <div class="border-l-4 border-yellow-600 pl-3 py-2 hover:bg-gray-50 transition-colors duration-300 cursor-pointer">
+                            <p class="text-gray-800 font-medium">반려동물 응급처치법</p>
+                            <p class="text-gray-500 text-xs flex items-center mt-1">
+                                <i class="fas fa-comments mr-1"></i>댓글 31개
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="navigateToPage('/community')" class="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105">
+                        커뮤니티 보기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fas fa-paw mr-2 text-yellow-500"></i>
+                        Triple T
+                    </h3>
+                    <p class="text-gray-300 text-sm">반려동물 AI 케어 서비스</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-2">서비스</h4>
+                    <ul class="text-sm text-gray-300 space-y-1">
+                        <li><a href="/ai-chat" class="hover:text-yellow-400">AI 대화</a></li>
+                        <li><a href="/diary" class="hover:text-yellow-400">AI 일기</a></li>
+                        <li><a href="/care-schedule" class="hover:text-yellow-400">건강 관리</a></li>
+                        <li><a href="/community" class="hover:text-yellow-400">커뮤니티</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-2">지원</h4>
+                    <ul class="text-sm text-gray-300 space-y-1">
+                        <li><a href="#" class="hover:text-yellow-400">고객센터</a></li>
+                        <li><a href="#" class="hover:text-yellow-400">FAQ</a></li>
+                        <li><a href="#" class="hover:text-yellow-400">이용약관</a></li>
+                        <li><a href="#" class="hover:text-yellow-400">개인정보처리방침</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 mt-8 text-center">
+                <p>&copy; 2025 Triple T. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 bg-yellow-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <div class="flex items-center">
+            <i class="fas fa-bell mr-2"></i>
+            <span id="toast-message"></span>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let appState = {
+            isLoggedIn: false,
+            currentUser: null,
+            petProfile: null
+        };
+
+        // Utility functions
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            
+            // Color based on type
+            const colors = {
+                'success': 'bg-green-500',
+                'error': 'bg-red-500',
+                'warning': 'bg-orange-500',
+                'info': 'bg-blue-500'
+            };
+            
+            toast.className = `fixed top-4 right-4 ${colors[type] || colors.info} text-white px-6 py-3 rounded-lg shadow-lg transform transition-transform duration-300 z-50`;
+            toast.style.transform = 'translateX(0)';
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(100%)';
+            }, 3000);
+        }
+
+        // Weather API implementation
+        async function loadWeather() {
+            try {
+                setTimeout(() => {
+                    const temp = Math.floor(Math.random() * 20) + 15; // 15-35도 랜덤
+                    const conditions = ['맑음', '구름조금', '흐림', '비', '눈'];
+                    const desc = conditions[Math.floor(Math.random() * conditions.length)];
+                    
+                    document.getElementById('weather-temp').textContent = temp + '°C';
+                    document.getElementById('weather-desc').textContent = desc;
+                    
+                    // 산책하기 좋은 날씨 알림
+                    const weatherInfo = document.getElementById('weather-info');
+                    if (temp >= 15 && temp <= 25 && (desc === '맑음' || desc === '구름조금')) {
+                        weatherInfo.classList.add('bg-green-100', 'text-green-800');
+                        weatherInfo.classList.remove('bg-gray-100', 'text-gray-700');
+                        weatherInfo.title = '산책하기 좋은 날씨입니다!';
+                        showToast('🌤️ 산책하기 좋은 날씨예요!', 'success');
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Weather data loading failed:', error);
+                document.getElementById('weather-desc').textContent = '날씨 정보 없음';
+            }
+        }
+
+        // Auth functionality
+        function toggleAuth() {
+            appState.isLoggedIn = !appState.isLoggedIn;
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            if (appState.isLoggedIn) {
+                loginBtn.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                updatePetProfile();
+                showToast('로그인되었습니다!', 'success');
+            } else {
+                loginBtn.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+                resetPetProfile();
+                showToast('로그아웃되었습니다.', 'info');
+            }
+        }
+
+        function updatePetProfile() {
+            const petProfile = document.getElementById('pet-profile');
+            petProfile.innerHTML = `
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-gradient-to-br from-orange-400 to-red-400 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden shadow-lg">
+                        <img src="https://via.placeholder.com/80x80/FF6B6B/FFFFFF?text=🐕" alt="반려동물" class="w-full h-full object-cover rounded-full">
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-1">🐕 멍멍이</h3>
+                    <p class="text-sm text-gray-600 mb-4">골든 리트리버 • 3살</p>
+                    <button onclick="startAIChat()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg text-sm transition-all duration-300 mb-2 transform hover:scale-105">
+                        AI 대화하기
+                    </button>
+                    <button onclick="editProfile()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105">
+                        프로필 수정
+                    </button>
+                </div>
+            `;
+        }
+
+        function resetPetProfile() {
+            const petProfile = document.getElementById('pet-profile');
+            petProfile.innerHTML = `
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-paw text-3xl text-white animate-pulse"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-2">내 반려동물 등록</h3>
+                    <p class="text-sm text-gray-600 mb-4">반려동물 정보를 등록하고 관리해보세요</p>
+                    <button onclick="registerPet()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 rounded-lg text-sm transition-all duration-300 transform hover:scale-105">
+                        + 반려동물 등록
+                    </button>
+                </div>
+            `;
+        }
+
+        // Navigation functions
+        function navigateToPage(path) {
+            showToast(`${path} 페이지로 이동합니다.`, 'info');
+            // 실제 환경에서는 window.location.href = path;
+        }
+
+        function registerPet() {
+            if (!appState.isLoggedIn) {
+                showToast('로그인이 필요합니다.', 'warning');
+                return;
+            }
+            showToast('반려동물 등록 페이지로 이동합니다.', 'info');
+            // navigateToPage('/pet/register');
+        }
+
+        function startAIChat() {
+            if (!appState.isLoggedIn) {
+                showToast('로그인 후 이용할 수 있습니다.', 'warning');
+                return;
+            }
+            showToast('🤖 AI와 대화를 시작합니다!', 'success');
+            // navigateToPage('/ai-chat');
+        }
+
+        function startService() {
+            if (!appState.isLoggedIn) {
+                showToast('먼저 로그인해주세요.', 'info');
+                document.getElementById('login-btn').click();
+            } else {
+                showToast('서비스를 시작합니다!', 'success');
+            }
+        }
+
+        function editProfile() {
+            showToast('프로필 수정 페이지로 이동합니다.', 'info');
+            // navigateToPage('/pet/edit');
+        }
+
+        // Quick action functions
+        function recordPhoto() {
+            if (!appState.isLoggedIn) {
+                showToast('로그인이 필요합니다.', 'warning');
+                return;
+            }
+            showToast('📸 사진을 등록했습니다!', 'success');
+        }
+
+        function recordMeal() {
+            if (!appState.isLoggedIn) {
+                showToast('로그인이 필요합니다.', 'warning');
+                return;
+            }
+            showToast('🍽️ 식사 기록을 저장했습니다!', 'success');
+        }
+
+        function recordWalk() {
+            if (!appState.isLoggedIn) {
+                showToast('로그인이 필요합니다.', 'warning');
+                return;
+            }
+            showToast('🚶 산책 기록을 저장했습니다!', 'success');
+        }
+
+        function healthCheck() {
+            if (!appState.isLoggedIn) {
+                showToast('로그인이 필요합니다.', 'warning');
+                return;
+            }
+            showToast('🏥 건강 체크를 완료했습니다!', 'success');
+        }
+
+        // Pet care reminders
+        function showCareReminder() {
+            if (!appState.isLoggedIn) return;
+            
+            const reminders = [
+                { message: "🍽️ 저녁 식사 시간이 다가왔어요!", type: "info" },
+                { message: "💧 물 그릇을 확인해주세요!", type: "warning" },
+                { message: "🚶 산책 시간이에요!", type: "success" },
+                { message: "💊 약물 복용 시간입니다!", type: "error" }
+            ];
+            
+            const randomReminder = reminders[Math.floor(Math.random() * reminders.length)];
+            showToast(randomReminder.message, randomReminder.type);
+        }
+
+        // Update schedule times dynamically
+        function updateScheduleTimes() {
+            const now = new Date();
+            const scheduleItems = document.querySelectorAll('#schedule-time');
+            
+            scheduleItems.forEach(item => {
+                const timeText = item.textContent;
+                const [hours, minutes] = timeText.split(':').map(Number);
+                const scheduleTime = new Date();
+                scheduleTime.setHours(hours, minutes, 0, 0);
+                
+                if (scheduleTime < now) {
+                    item.parentElement.classList.add('opacity-50');
+                }
+            });
+        }
+
+        // Real-time updates
+        function startRealTimeUpdates() {
+            // Update time every minute
+            setInterval(() => {
+                updateScheduleTimes();
+            }, 60000);
+
+            // Show care reminders every 5 minutes (for demo purposes)
+            setInterval(showCareReminder, 300000);
+
+            // Animate paw icon
+            setInterval(() => {
+                const pawIcon = document.querySelector('.fa-paw');
+                if (pawIcon) {
+                    pawIcon.classList.add('animate-bounce');
+                    setTimeout(() => {
+                        pawIcon.classList.remove('animate-bounce');
+                    }, 1000);
+                }
+            }, 10000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load weather
+            loadWeather();
+            
+            // Start real-time updates
+            startRealTimeUpdates();
+            
+            // Auth event listeners
+            document.getElementById('login-btn').addEventListener('click', function() {
+                showToast('로그인 처리 중...', 'info');
+                setTimeout(() => {
+                    toggleAuth();
+                }, 1000);
+            });
+
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                if (confirm('로그아웃 하시겠습니까?')) {
+                    toggleAuth();
+                }
+            });
+
+            // Add smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Add intersection observer for animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all cards
+            document.querySelectorAll('.bg-white').forEach(card => {
+                observer.observe(card);
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl/Cmd + K for search (future feature)
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                showToast('검색 기능은 곧 출시될 예정입니다!', 'info');
+            }
+            
+            // Escape to close any modals (future feature)
+            if (e.key === 'Escape') {
+                // Close modals logic here
+            }
+        });
+
+        // Service Worker registration (for future PWA features)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                // navigator.serviceWorker.register('/sw.js')
+                //     .then(registration => console.log('SW registered'))
+                //     .catch(error => console.log('SW registration failed'));
+            });
+        }
+
+        // Error handling
+        window.addEventListener('error', function(e) {
+            console.error('Application error:', e.error);
+            showToast('일시적인 오류가 발생했습니다. 새로고침해주세요.', 'error');
+        });
+
+        // Network status monitoring
+        window.addEventListener('online', () => {
+            showToast('인터넷 연결이 복구되었습니다.', 'success');
+        });
+
+        window.addEventListener('offline', () => {
+            showToast('인터넷 연결이 끊어졌습니다.', 'warning');
+        });
+    </script>
+
+    <style>
+        /* Custom animations */
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fade-in 0.6s ease-out forwards;
+        }
+
+        /* Smooth transitions for all interactive elements */
+        * {
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #fbbf24;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+
+        /* Loading skeleton (for future use) */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Focus styles for accessibility */
+        button:focus,
+        a:focus,
+        input:focus {
+            outline: 2px solid #fbbf24;
+            outline-offset: 2px;
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</body>
+</html>
