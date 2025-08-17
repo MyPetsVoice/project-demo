@@ -1,0 +1,603 @@
+{% extends "base.html" %}
+
+{% block title %}마이페이지 - MyPet's Voice{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mypage.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="mypage-container">
+    <div class="mypage-sidebar">
+        <div class="profile-card">
+            <div class="profile-image">
+                <img src="https://via.placeholder.com/100x100/ff6b6b/ffffff?text=User" alt="프로필" id="profile-image">
+                <div class="image-upload" onclick="uploadProfileImage()">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            <h3 id="profile-nickname">{{ session.user_name or '반려동물러버' }}</h3>
+            <p id="profile-email">{{ session.user_email or 'demo@mypetsvoice.com' }}</p>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <span class="stat-number">2</span>
+                    <span class="stat-label">반려동물</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">15</span>
+                    <span class="stat-label">일기</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">42</span>
+                    <span class="stat-label">게시글</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-list">
+            <button class="menu-item active" onclick="showMypageTab(this, 'overview')">
+                <i class="fas fa-tachometer-alt"></i> 대시보드
+            </button>
+            <button class="menu-item" onclick="showMypageTab(this, 'profile')">
+                <i class="fas fa-user"></i> 프로필 설정
+            </button>
+            <button class="menu-item" onclick="showMypageTab(this, 'pets')">
+                <i class="fas fa-paw"></i> 반려동물 관리
+            </button>
+            <button class="menu-item" onclick="showMypageTab(this, 'diaries')">
+                <i class="fas fa-book"></i> 내 일기
+            </button>
+            <button class="menu-item" onclick="showMypageTab(this, 'posts')">
+                <i class="fas fa-edit"></i> 내 게시글
+            </button>
+            <button class="menu-item" onclick="showMypageTab(this, 'bookmarks')">
+                <i class="fas fa-bookmark"></i> 북마크
+            </button>
+            <button class="menu-item" onclick="showMypageTab(this, 'settings')">
+                <i class="fas fa-cog"></i> 계정 설정
+            </button>
+        </div>
+    </div>
+
+    <div class="mypage-content">
+        <!-- 대시보드 -->
+        <div class="tab-content active" id="overview-tab">
+            <h3>대시보드</h3>
+            
+            <!-- 요약 카드 -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="card-header">
+                        <h4>이번 주 활동</h4>
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="activity-item">
+                            <span class="activity-label">일기 작성</span>
+                            <span class="activity-count">3개</span>
+                        </div>
+                        <div class="activity-item">
+                            <span class="activity-label">게시글 작성</span>
+                            <span class="activity-count">2개</span>
+                        </div>
+                        <div class="activity-item">
+                            <span class="activity-label">댓글 작성</span>
+                            <span class="activity-count">8개</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="card-header">
+                        <h4>반려동물 현황</h4>
+                        <i class="fas fa-paw"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="pet-summary">
+                            <div class="pet-item">
+                                <div class="pet-avatar">🐕</div>
+                                <div class="pet-info">
+                                    <span class="pet-name">멍멍이</span>
+                                    <span class="pet-status">건강</span>
+                                </div>
+                            </div>
+                            <div class="pet-item">
+                                <div class="pet-avatar">🐱</div>
+                                <div class="pet-info">
+                                    <span class="pet-name">야옹이</span>
+                                    <span class="pet-status">건강</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="card-header">
+                        <h4>알림</h4>
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="notification-item urgent">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>멍멍이 예방접종 3일 후</span>
+                        </div>
+                        <div class="notification-item">
+                            <i class="fas fa-cut"></i>
+                            <span>야옹이 미용 예약 확인</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 최근 활동 -->
+            <div class="recent-activity">
+                <h4>최근 활동</h4>
+                <div class="activity-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">오늘</div>
+                        <div class="timeline-content">
+                            <div class="activity-card">
+                                <div class="activity-icon diary">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <h5>일기 작성</h5>
+                                    <p>"오늘 산책이 너무 즐거웠어!" 일기를 작성했습니다</p>
+                                    <span class="activity-time">2시간 전</span>
+                                </div>
+                            </div>
+                            
+                            <div class="activity-card">
+                                <div class="activity-icon comment">
+                                    <i class="fas fa-comment"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <h5>댓글 작성</h5>
+                                    <p>"한강공원에서 같이 산책하실 분!" 게시글에 댓글을 남겼습니다</p>
+                                    <span class="activity-time">3시간 전</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="timeline-item">
+                        <div class="timeline-date">어제</div>
+                        <div class="timeline-content">
+                            <div class="activity-card">
+                                <div class="activity-icon post">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                <div class="activity-info">
+                                    <h5>게시글 작성</h5>
+                                    <p>"반려견 겨울 산책 팁 공유" 게시글을 작성했습니다</p>
+                                    <span class="activity-time">1일 전</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 프로필 설정 -->
+        <div class="tab-content" id="profile-tab">
+            <h3>프로필 설정</h3>
+            <form id="profile-form" onsubmit="handleProfileUpdate(event)">
+                <div class="form-section">
+                    <h4>기본 정보</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>닉네임</label>
+                            <input type="text" name="nickname" value="반려동물러버" placeholder="닉네임을 입력하세요">
+                        </div>
+                        <div class="form-group">
+                            <label>이메일</label>
+                            <input type="email" name="email" value="demo@mypetsvoice.com" readonly>
+                            <small>이메일은 변경할 수 없습니다</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>자기소개</label>
+                        <textarea name="bio" placeholder="자신을 소개해주세요" rows="3">반려동물과 함께하는 일상을 사랑하는 집사입니다 🐾</textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>지역</label>
+                            <select name="region">
+                                <option value="">선택하세요</option>
+                                <option value="seoul" selected>서울</option>
+                                <option value="gyeonggi">경기</option>
+                                <option value="incheon">인천</option>
+                                <option value="busan">부산</option>
+                                <option value="daegu">대구</option>
+                                <option value="daejeon">대전</option>
+                                <option value="gwangju">광주</option>
+                                <option value="ulsan">울산</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>성별</label>
+                            <select name="gender">
+                                <option value="">선택안함</option>
+                                <option value="male">남성</option>
+                                <option value="female" selected>여성</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>개인정보 공개 설정</h4>
+                    <div class="privacy-settings">
+                        <div class="privacy-item">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="show_profile" checked>
+                                <span class="checkmark"></span>
+                                프로필 정보 공개
+                            </label>
+                        </div>
+                        <div class="privacy-item">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="show_activity" checked>
+                                <span class="checkmark"></span>
+                                활동 내역 공개
+                            </label>
+                        </div>
+                        <div class="privacy-item">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="show_pets">
+                                <span class="checkmark"></span>
+                                반려동물 정보 공개
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 저장하기
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 반려동물 관리 -->
+        <div class="tab-content" id="pets-tab">
+            <div class="tab-header">
+                <h3>반려동물 관리</h3>
+                <a href="{{ url_for('mypage.pets') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> 반려동물 추가
+                </a>
+            </div>
+            <div class="pets-grid">
+                <div class="pet-card-mypage">
+                    <div class="pet-image">
+                        <img src="https://via.placeholder.com/150x150/ff6b6b/ffffff?text=🐕" alt="멍멍이">
+                    </div>
+                    <div class="pet-info">
+                        <h4>멍멍이</h4>
+                        <p class="pet-breed">골든 리트리버</p>
+                        <div class="pet-details">
+                            <span>3세 • 수컷</span>
+                            <span>25.2kg</span>
+                        </div>
+                        <div class="pet-status">
+                            <span class="status-badge healthy">건강</span>
+                        </div>
+                    </div>
+                    <div class="pet-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editPet(1)">
+                            <i class="fas fa-edit"></i> 수정
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="viewPetProfile(1)">
+                            <i class="fas fa-eye"></i> 상세보기
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pet-card-mypage">
+                    <div class="pet-image">
+                        <img src="https://via.placeholder.com/150x150/9b59b6/ffffff?text=🐱" alt="야옹이">
+                    </div>
+                    <div class="pet-info">
+                        <h4>야옹이</h4>
+                        <p class="pet-breed">러시안 블루</p>
+                        <div class="pet-details">
+                            <span>2세 • 암컷</span>
+                            <span>4.1kg</span>
+                        </div>
+                        <div class="pet-status">
+                            <span class="status-badge healthy">건강</span>
+                        </div>
+                    </div>
+                    <div class="pet-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editPet(2)">
+                            <i class="fas fa-edit"></i> 수정
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="viewPetProfile(2)">
+                            <i class="fas fa-eye"></i> 상세보기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 내 일기 -->
+        <div class="tab-content" id="diaries-tab">
+            <div class="tab-header">
+                <h3>내 일기</h3>
+                <a href="{{ url_for('diary.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> 일기 쓰기
+                </a>
+            </div>
+            <div class="content-list">
+                <div class="content-item">
+                    <div class="content-info">
+                        <h4>오늘 산책이 너무 즐거웠어!</h4>
+                        <p>한강공원에서 멍멍이와 함께한 즐거운 시간...</p>
+                        <div class="content-meta">
+                            <span class="date">2025.01.10</span>
+                            <span class="pet">🐕 멍멍이</span>
+                            <span class="stats">❤️ 15 👀 32</span>
+                        </div>
+                    </div>
+                    <div class="content-actions">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="content-item">
+                    <div class="content-info">
+                        <h4>새 장난감이 왔어!</h4>
+                        <p>야옹이가 새 깃털 장난감을 좋아해요...</p>
+                        <div class="content-meta">
+                            <span class="date">2025.01.09</span>
+                            <span class="pet">🐱 야옹이</span>
+                            <span class="stats">❤️ 22 👀 45</span>
+                        </div>
+                    </div>
+                    <div class="content-actions">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 내 게시글 -->
+        <div class="tab-content" id="posts-tab">
+            <div class="tab-header">
+                <h3>내 게시글</h3>
+                <a href="{{ url_for('community.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> 글쓰기
+                </a>
+            </div>
+            <div class="content-list">
+                <div class="content-item">
+                    <div class="content-info">
+                        <h4>반려견 겨울 산책 시 주의사항</h4>
+                        <p>추운 겨울, 강아지와 안전하게 산책하는 방법들...</p>
+                        <div class="content-meta">
+                            <span class="date">2025.01.09</span>
+                            <span class="category">정보공유</span>
+                            <span class="stats">❤️ 42 💬 15 👀 256</span>
+                        </div>
+                    </div>
+                    <div class="content-actions">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 북마크 -->
+        <div class="tab-content" id="bookmarks-tab">
+            <h3>북마크</h3>
+            <div class="bookmark-categories">
+                <button class="category-tab active" data-category="all">전체</button>
+                <button class="category-tab" data-category="diary">일기</button>
+                <button class="category-tab" data-category="community">게시글</button>
+                <button class="category-tab" data-category="place">장소</button>
+            </div>
+            <div class="content-list">
+                <div class="content-item">
+                    <div class="content-info">
+                        <h4>한강공원에서 같이 산책하실 분!</h4>
+                        <p>이번 주말 한강공원에서 강아지들과 함께...</p>
+                        <div class="content-meta">
+                            <span class="date">2025.01.08</span>
+                            <span class="type">커뮤니티</span>
+                            <span class="author">by 멍멍맘</span>
+                        </div>
+                    </div>
+                    <div class="content-actions">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-bookmark-slash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 계정 설정 -->
+        <div class="tab-content" id="settings-tab">
+            <h3>계정 설정</h3>
+            
+            <div class="settings-section">
+                <h4>계정 정보</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>이메일</label>
+                        <span>demo@mypetsvoice.com</span>
+                    </div>
+                    <div class="info-item">
+                        <label>가입일</label>
+                        <span>2025년 1월 1일</span>
+                    </div>
+                    <div class="info-item">
+                        <label>로그인 방식</label>
+                        <span>일반 회원가입</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>알림 설정</h4>
+                <div class="notification-settings">
+                    <div class="setting-item">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" name="email_notification" checked>
+                            <span class="checkmark"></span>
+                            이메일 알림 받기
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" name="push_notification" checked>
+                            <span class="checkmark"></span>
+                            푸시 알림 받기
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" name="marketing_notification">
+                            <span class="checkmark"></span>
+                            마케팅 정보 받기
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h4>계정 관리</h4>
+                <div class="account-actions">
+                    <button class="btn btn-outline" onclick="changePassword()">
+                        <i class="fas fa-key"></i> 비밀번호 변경
+                    </button>
+                    <button class="btn btn-outline" onclick="exportData()">
+                        <i class="fas fa-download"></i> 내 데이터 내려받기
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteAccount()">
+                        <i class="fas fa-user-times"></i> 계정 탈퇴
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/mypage.js') }}"></script>
+<script>
+// 탭 전환
+function showMypageTab(menuItem, tabId) {
+    // 메뉴 아이템 활성화
+    document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+    menuItem.classList.add('active');
+    
+    // 탭 컨텐츠 전환
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.getElementById(tabId + '-tab').classList.add('active');
+}
+
+// 프로필 이미지 업로드
+function uploadProfileImage() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profile-image').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            // TODO: 실제 이미지 업로드 API 호출
+        }
+    };
+    input.click();
+}
+
+// 프로필 업데이트
+function handleProfileUpdate(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    
+    // TODO: 실제 프로필 업데이트 API 호출
+    alert('프로필이 업데이트되었습니다!');
+}
+
+// 반려동물 관련 함수
+function editPet(petId) {
+    // TODO: 반려동물 편집 모달 또는 페이지로 이동
+    alert(`반려동물 ${petId} 편집 기능`);
+}
+
+function viewPetProfile(petId) {
+    // TODO: 반려동물 상세 프로필 보기
+    alert(`반려동물 ${petId} 상세보기 기능`);
+}
+
+// 북마크 카테고리 전환
+document.querySelectorAll('.category-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        const category = this.dataset.category;
+        // TODO: 해당 카테고리의 북마크 로드
+        console.log('북마크 카테고리:', category);
+    });
+});
+
+// 계정 설정 관련 함수
+function changePassword() {
+    // TODO: 비밀번호 변경 모달 표시
+    alert('비밀번호 변경 기능');
+}
+
+function exportData() {
+    // TODO: 데이터 내보내기 기능
+    alert('내 데이터 내려받기 기능');
+}
+
+function deleteAccount() {
+    if (confirm('정말로 계정을 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+        // TODO: 계정 삭제 API 호출
+        alert('계정 탈퇴 기능');
+    }
+}
+</script>
+{% endblock %}

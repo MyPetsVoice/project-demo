@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+
+{% block title %}건강관리 - 데일리케어{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dailycare.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="health-container">
+    <div class="health-header">
+        <div class="breadcrumb">
+            <a href="{{ url_for('dailycare.index') }}">데일리케어</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>건강관리</span>
+        </div>
+        <h2>건강관리</h2>
+        <p>반려동물의 건강 상태를 체계적으로 관리하세요</p>
+    </div>
+
+    <!-- 반려동물 선택 -->
+    <div class="pet-selector">
+        <div class="pet-tabs">
+            <button class="pet-tab active" data-pet="1">
+                <div class="pet-avatar">🐕</div>
+                <span>멍멍이</span>
+            </button>
+            <button class="pet-tab" data-pet="2">
+                <div class="pet-avatar">🐱</div>
+                <span>야옹이</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 건강 개요 -->
+    <div class="health-overview">
+        <div class="overview-card">
+            <div class="card-header">
+                <h3>현재 건강 상태</h3>
+                <div class="health-status good">
+                    <i class="fas fa-heart"></i>
+                    <span>양호</span>
+                </div>
+            </div>
+            <div class="vital-signs">
+                <div class="vital-item">
+                    <div class="vital-label">체중</div>
+                    <div class="vital-value">25.2kg</div>
+                    <div class="vital-change neutral">→</div>
+                </div>
+                <div class="vital-item">
+                    <div class="vital-label">체온</div>
+                    <div class="vital-value">38.1°C</div>
+                    <div class="vital-change good">↓</div>
+                </div>
+                <div class="vital-item">
+                    <div class="vital-label">심박수</div>
+                    <div class="vital-value">85 bpm</div>
+                    <div class="vital-change good">→</div>
+                </div>
+                <div class="vital-item">
+                    <div class="vital-label">마지막 검진</div>
+                    <div class="vital-value">2024.12.15</div>
+                    <div class="vital-note">26일 전</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 빠른 액션 -->
+    <div class="quick-actions">
+        <button class="action-btn" onclick="recordVitals()">
+            <i class="fas fa-thermometer-half"></i>
+            <span>체온/체중 기록</span>
+        </button>
+        <button class="action-btn" onclick="recordSymptom()">
+            <i class="fas fa-notes-medical"></i>
+            <span>증상 기록</span>
+        </button>
+        <button class="action-btn" onclick="scheduleCheckup()">
+            <i class="fas fa-calendar-plus"></i>
+            <span>검진 예약</span>
+        </button>
+        <button class="action-btn" onclick="viewMedicalHistory()">
+            <i class="fas fa-file-medical"></i>
+            <span>진료 기록</span>
+        </button>
+    </div>
+
+    <!-- 체중 차트 -->
+    <div class="chart-section">
+        <div class="chart-header">
+            <h3>체중 변화 추이</h3>
+            <div class="chart-controls">
+                <select id="weight-period">
+                    <option value="1month">1개월</option>
+                    <option value="3months">3개월</option>
+                    <option value="6months">6개월</option>
+                    <option value="1year">1년</option>
+                </select>
+            </div>
+        </div>
+        <div class="chart-container">
+            <!-- TODO: 실제 차트 라이브러리 연동 -->
+            <div class="chart-placeholder">
+                <canvas id="weight-chart" width="600" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- 예방접종 현황 -->
+    <div class="vaccination-section">
+        <div class="section-header">
+            <h3>예방접종 현황</h3>
+            <button class="btn btn-outline btn-sm" onclick="addVaccination()">
+                <i class="fas fa-plus"></i> 접종 추가
+            </button>
+        </div>
+        <div class="vaccination-list">
+            <div class="vaccination-item completed">
+                <div class="vaccination-icon">
+                    <i class="fas fa-syringe"></i>
+                </div>
+                <div class="vaccination-info">
+                    <h4>광견병 예방접종</h4>
+                    <p class="vaccination-date">2024.12.15 접종 완료</p>
+                    <p class="next-date">다음 접종: 2025.12.15</p>
+                </div>
+                <div class="vaccination-status">
+                    <span class="status-badge completed">완료</span>
+                </div>
+            </div>
+
+            <div class="vaccination-item upcoming">
+                <div class="vaccination-icon">
+                    <i class="fas fa-syringe"></i>
+                </div>
+                <div class="vaccination-info">
+                    <h4>종합백신 (DHPPL)</h4>
+                    <p class="vaccination-date">2024.11.15 접종 완료</p>
+                    <p class="next-date">다음 접종: 2025.11.15 (10개월 후)</p>
+                </div>
+                <div class="vaccination-status">
+                    <span class="status-badge upcoming">예정</span>
+                </div>
+            </div>
+
+            <div class="vaccination-item overdue">
+                <div class="vaccination-icon">
+                    <i class="fas fa-syringe"></i>
+                </div>
+                <div class="vaccination-info">
+                    <h4>켄넬코프 예방접종</h4>
+                    <p class="vaccination-date">2024.07.15 접종 완료</p>
+                    <p class="next-date">다음 접종: 2025.01.15 (3일 전)</p>
+                </div>
+                <div class="vaccination-status">
+                    <span class="status-badge overdue">지연</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 건강 기록 -->
+    <div class="health-records">
+        <div class="section-header">
+            <h3>최근 건강 기록</h3>
+            <button class="btn btn-outline btn-sm" onclick="viewAllRecords()">
+                전체보기
+            </button>
+        </div>
+        <div class="records-list">
+            <div class="record-item">
+                <div class="record-date">
+                    <div class="date">15</div>
+                    <div class="month">1월</div>
+                </div>
+                <div class="record-content">
+                    <h4>정기 건강검진</h4>
+                    <p>전체적으로 건강상태 양호. 체중 관리 필요</p>
+                    <div class="record-tags">
+                        <span class="tag">검진</span>
+                        <span class="tag">체중관리</span>
+                    </div>
+                </div>
+                <div class="record-actions">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="record-item">
+                <div class="record-date">
+                    <div class="date">10</div>
+                    <div class="month">1월</div>
+                </div>
+                <div class="record-content">
+                    <h4>체중 측정</h4>
+                    <p>25.2kg (전회 대비 +0.3kg)</p>
+                    <div class="record-tags">
+                        <span class="tag">체중</span>
+                    </div>
+                </div>
+                <div class="record-actions">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="record-item">
+                <div class="record-date">
+                    <div class="date">08</div>
+                    <div class="month">1월</div>
+                </div>
+                <div class="record-content">
+                    <h4>설사 증상</h4>
+                    <p>가벼운 설사 증상 있었으나 하루 만에 회복</p>
+                    <div class="record-tags">
+                        <span class="tag">증상</span>
+                        <span class="tag">소화기</span>
+                    </div>
+                </div>
+                <div class="record-actions">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 복용 중인 약물 -->
+    <div class="medication-section">
+        <div class="section-header">
+            <h3>복용 중인 약물/영양제</h3>
+            <button class="btn btn-outline btn-sm" onclick="addMedication()">
+                <i class="fas fa-plus"></i> 약물 추가
+            </button>
+        </div>
+        <div class="medication-list">
+            <div class="medication-item">
+                <div class="medication-icon">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div class="medication-info">
+                    <h4>관절 영양제</h4>
+                    <p class="dosage">1일 1정, 식후 복용</p>
+                    <p class="duration">2024.12.01 ~ 2025.02.28</p>
+                </div>
+                <div class="medication-status">
+                    <span class="status-badge active">복용중</span>
+                </div>
+            </div>
+
+            <div class="medication-item">
+                <div class="medication-icon">
+                    <i class="fas fa-capsules"></i>
+                </div>
+                <div class="medication-info">
+                    <h4>유산균</h4>
+                    <p class="dosage">1일 1회, 아침 식사와 함께</p>
+                    <p class="duration">상시 복용</p>
+                </div>
+                <div class="medication-status">
+                    <span class="status-badge active">복용중</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 체온/체중 기록 모달 -->
+<div class="modal" id="vitals-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>체온/체중 기록</h3>
+            <button class="modal-close" onclick="closeVitalsModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="vitals-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>체중 (kg)</label>
+                        <input type="number" name="weight" step="0.1" placeholder="25.2">
+                    </div>
+                    <div class="form-group">
+                        <label>체온 (°C)</label>
+                        <input type="number" name="temperature" step="0.1" placeholder="38.1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>메모</label>
+                    <textarea name="memo" placeholder="특이사항이 있다면 기록해주세요" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeVitalsModal()">
+                        취소
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        기록하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 증상 기록 모달 -->
+<div class="modal" id="symptom-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>증상 기록</h3>
+            <button class="modal-close" onclick="closeSymptomModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="symptom-form">
+                <div class="form-group">
+                    <label>증상 카테고리</label>
+                    <select name="category" required>
+                        <option value="">선택하세요</option>
+                        <option value="digestive">소화기계</option>
+                        <option value="respiratory">호흡기계</option>
+                        <option value="skin">피부</option>
+                        <option value="behavior">행동/정신</option>
+                        <option value="eye">눈</option>
+                        <option value="ear">귀</option>
+                        <option value="etc">기타</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>증상 설명</label>
+                    <textarea name="description" required placeholder="증상을 자세히 기록해주세요" rows="4"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>심각도</label>
+                        <select name="severity">
+                            <option value="mild">경미</option>
+                            <option value="moderate">보통</option>
+                            <option value="severe">심각</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>지속 시간</label>
+                        <input type="text" name="duration" placeholder="예: 3일째, 1시간">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeSymptomModal()">
+                        취소
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        기록하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dailycare.js') }}"></script>
+<script>
+// 모달 관리
+function recordVitals() {
+    document.getElementById('vitals-modal').classList.add('active');
+}
+
+function closeVitalsModal() {
+    document.getElementById('vitals-modal').classList.remove('active');
+    document.getElementById('vitals-form').reset();
+}
+
+function recordSymptom() {
+    document.getElementById('symptom-modal').classList.add('active');
+}
+
+function closeSymptomModal() {
+    document.getElementById('symptom-modal').classList.remove('active');
+    document.getElementById('symptom-form').reset();
+}
+
+// 반려동물 탭 전환
+document.querySelectorAll('.pet-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.pet-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        const petId = this.dataset.pet;
+        loadPetHealthData(petId);
+    });
+});
+
+// 체온/체중 기록 폼 제출
+document.getElementById('vitals-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    try {
+        // TODO: 실제 API 호출
+        alert('체온/체중이 기록되었습니다!');
+        closeVitalsModal();
+        // 데이터 새로고침
+        location.reload();
+    } catch (error) {
+        alert('기록 저장 중 오류가 발생했습니다.');
+    }
+});
+
+// 증상 기록 폼 제출
+document.getElementById('symptom-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    try {
+        // TODO: 실제 API 호출
+        alert('증상이 기록되었습니다!');
+        closeSymptomModal();
+        // 데이터 새로고침
+        location.reload();
+    } catch (error) {
+        alert('기록 저장 중 오류가 발생했습니다.');
+    }
+});
+
+// 기타 기능들
+function scheduleCheckup() {
+    alert('검진 예약 기능을 구현합니다.');
+}
+
+function viewMedicalHistory() {
+    alert('진료 기록 조회 기능을 구현합니다.');
+}
+
+function addVaccination() {
+    alert('예방접종 추가 기능을 구현합니다.');
+}
+
+function addMedication() {
+    alert('약물 추가 기능을 구현합니다.');
+}
+
+function viewAllRecords() {
+    alert('전체 건강 기록 조회 기능을 구현합니다.');
+}
+
+function loadPetHealthData(petId) {
+    // TODO: 선택된 반려동물의 건강 데이터 로드
+    console.log('로드할 반려동물 ID:', petId);
+}
+
+// 차트 기간 변경
+document.getElementById('weight-period').addEventListener('change', function() {
+    const period = this.value;
+    // TODO: 차트 데이터 업데이트
+    console.log('차트 기간 변경:', period);
+});
+
+// 간단한 체중 차트 그리기 (실제로는 Chart.js 등 사용)
+function drawWeightChart() {
+    const canvas = document.getElementById('weight-chart');
+    const ctx = canvas.getContext('2d');
+    
+    // 샘플 데이터
+    const data = [24.8, 25.0, 24.9, 25.1, 25.2, 25.0, 25.2];
+    const labels = ['12/15', '12/22', '12/29', '1/5', '1/12', '1/19', '1/26'];
+    
+    // 간단한 선 차트 그리기
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#ff6b6b';
+    ctx.lineWidth = 2;
+    
+    const padding = 40;
+    const chartWidth = canvas.width - padding * 2;
+    const chartHeight = canvas.height - padding * 2;
+    
+    ctx.beginPath();
+    for (let i = 0; i < data.length; i++) {
+        const x = padding + (i * chartWidth / (data.length - 1));
+        const y = padding + chartHeight - ((data[i] - 24.5) / 1 * chartHeight);
+        
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+        
+        // 데이터 포인트 그리기
+        ctx.fillStyle = '#ff6b6b';
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.strokeStyle = '#ff6b6b';
+    }
+    ctx.stroke();
+}
+
+// 페이지 로드 시 차트 그리기
+document.addEventListener('DOMContentLoaded', function() {
+    drawWeightChart();
+});
+
+// 모달 외부 클릭 시 닫기
+document.querySelectorAll('.modal').forEach(modal => {
+    modal.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,454 @@
+{% extends "base.html" %}
+
+{% block title %}프로필 관리 - MyPet's Voice{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mypage.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-management-container">
+    <div class="profile-header">
+        <div class="breadcrumb">
+            <a href="{{ url_for('mypage.index') }}">마이페이지</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>프로필 관리</span>
+        </div>
+        <h2>프로필 관리</h2>
+        <p>개인정보를 안전하게 관리하세요</p>
+    </div>
+
+    <div class="profile-content">
+        <!-- 프로필 이미지 섹션 -->
+        <div class="profile-image-section">
+            <div class="image-container">
+                <div class="current-image">
+                    <img src="https://via.placeholder.com/150x150/ff6b6b/ffffff?text=User" alt="프로필 이미지" id="profile-image">
+                </div>
+                <div class="image-actions">
+                    <button class="btn btn-primary" onclick="changeProfileImage()">
+                        <i class="fas fa-camera"></i> 이미지 변경
+                    </button>
+                    <button class="btn btn-outline" onclick="removeProfileImage()">
+                        <i class="fas fa-trash"></i> 삭제
+                    </button>
+                </div>
+            </div>
+            <div class="image-guidelines">
+                <h4>프로필 이미지 가이드라인</h4>
+                <ul>
+                    <li>JPG, PNG 형식만 업로드 가능</li>
+                    <li>최대 파일 크기: 5MB</li>
+                    <li>권장 크기: 500x500px 이상</li>
+                    <li>얼굴이 잘 보이는 사진을 권장합니다</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 기본 정보 폼 -->
+        <form class="profile-form" id="profile-form">
+            <div class="form-section">
+                <h3>기본 정보</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="username">아이디</label>
+                        <input type="text" id="username" name="username" value="petlover123" readonly>
+                        <small>아이디는 변경할 수 없습니다</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">이메일</label>
+                        <input type="email" id="email" name="email" value="demo@mypetsvoice.com" readonly>
+                        <small>이메일 변경은 고객센터에 문의하세요</small>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nickname">닉네임 *</label>
+                        <input type="text" id="nickname" name="nickname" value="반려동물러버" required>
+                        <small>다른 사용자에게 표시되는 이름입니다</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">전화번호</label>
+                        <input type="tel" id="phone" name="phone" value="010-1234-5678" placeholder="010-0000-0000">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="bio">자기소개</label>
+                    <textarea id="bio" name="bio" rows="4" placeholder="자신을 소개해주세요">반려동물과 함께하는 일상을 사랑하는 집사입니다 🐾 
+멍멍이와 야옹이와 함께 행복한 나날을 보내고 있어요!</textarea>
+                    <div class="char-count">
+                        <span id="bio-count">67</span> / 200자
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>추가 정보</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="birth-year">출생년도</label>
+                        <select id="birth-year" name="birth_year">
+                            <option value="">선택하세요</option>
+                            <option value="2000">2000년</option>
+                            <option value="1999">1999년</option>
+                            <option value="1998">1998년</option>
+                            <option value="1997">1997년</option>
+                            <option value="1996">1996년</option>
+                            <option value="1995" selected>1995년</option>
+                            <option value="1994">1994년</option>
+                            <option value="1993">1993년</option>
+                            <option value="1992">1992년</option>
+                            <option value="1991">1991년</option>
+                            <option value="1990">1990년</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">성별</label>
+                        <select id="gender" name="gender">
+                            <option value="">선택안함</option>
+                            <option value="male">남성</option>
+                            <option value="female" selected>여성</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="region">지역</label>
+                        <select id="region" name="region">
+                            <option value="">선택하세요</option>
+                            <option value="seoul" selected>서울특별시</option>
+                            <option value="gyeonggi">경기도</option>
+                            <option value="incheon">인천광역시</option>
+                            <option value="busan">부산광역시</option>
+                            <option value="daegu">대구광역시</option>
+                            <option value="daejeon">대전광역시</option>
+                            <option value="gwangju">광주광역시</option>
+                            <option value="ulsan">울산광역시</option>
+                            <option value="gangwon">강원도</option>
+                            <option value="chungbuk">충청북도</option>
+                            <option value="chungnam">충청남도</option>
+                            <option value="jeonbuk">전라북도</option>
+                            <option value="jeonnam">전라남도</option>
+                            <option value="gyeongbuk">경상북도</option>
+                            <option value="gyeongnam">경상남도</option>
+                            <option value="jeju">제주특별자치도</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="occupation">직업</label>
+                        <input type="text" id="occupation" name="occupation" value="직장인" placeholder="직업을 입력하세요">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>관심사</h3>
+                <div class="interests-section">
+                    <label>반려동물 관련 관심사를 선택하세요</label>
+                    <div class="interests-grid">
+                        <label class="interest-item">
+                            <input type="checkbox" name="interests" value="training" checked>
+                            <span class="interest-label">
+                                <i class="fas fa-graduation-cap"></i>
+                                훈련/교육
+                            </span>
+                        </label>
+                        <label class="interest-item">
+                            <input type="checkbox" name="interests" value="health" checked>
+                            <span class="interest-label">
+                                <i class="fas fa-heartbeat"></i>
+                                건강관리
+                            </span>
+                        </label>
+                        <label class="interest-item">
+                            <input type="checkbox" name="interests" value="nutrition">
+                            <span class="interest-label">
+                                <i class="fas fa-utensils"></i>
+                                영양/사료
+                            </span>
+                        </label>
+                        <label class="interest-item">
+                            <input type="checkbox" name="interests" value="grooming">
+                            <span class="interest-label">
+                                <i class="fas fa-cut"></i>
+                                미용/케어
+                            </span>
+                        </label>
+                        <label class="interest-item">
+                            <input type="checkbox" name="interests" value="travel" checked>
+                            <span class="interest-label">
+                                <i class="fas fa-map-marked-alt"></i>
+                                여행/나들이
+                            </span>
+                        </label>
+                        <label class="interest-item">
+                            <input type="checkbox" name="interests" value="diy">
+                            <span class="interest-label">
+                                <i class="fas fa-tools"></i>
+                                DIY/만들기
+                            </span>
+                        </label>
+                        <label class="interest-item">
+                            <input type="checkbox" name="interests" value="photography">
+                            <span class="interest-label">
+                                <i class="fas fa-camera"></i>
+                                사진촬영
+                            </span>
+                        </label>
+                        <label class="interest-item">
+                            <input type="checkbox" name="interests" value="community">
+                            <span class="interest-label">
+                                <i class="fas fa-users"></i>
+                                커뮤니티 활동
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>개인정보 공개 설정</h3>
+                <div class="privacy-settings">
+                    <div class="privacy-item">
+                        <div class="privacy-header">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="show_profile" checked>
+                                <span class="checkmark"></span>
+                                프로필 정보 공개
+                            </label>
+                        </div>
+                        <p>다른 사용자가 내 프로필 정보를 볼 수 있습니다</p>
+                    </div>
+
+                    <div class="privacy-item">
+                        <div class="privacy-header">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="show_activity" checked>
+                                <span class="checkmark"></span>
+                                활동 내역 공개
+                            </label>
+                        </div>
+                        <p>내가 작성한 글, 댓글 등의 활동을 다른 사용자가 볼 수 있습니다</p>
+                    </div>
+
+                    <div class="privacy-item">
+                        <div class="privacy-header">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="show_pets">
+                                <span class="checkmark"></span>
+                                반려동물 정보 공개
+                            </label>
+                        </div>
+                        <p>내 반려동물 정보를 다른 사용자가 볼 수 있습니다</p>
+                    </div>
+
+                    <div class="privacy-item">
+                        <div class="privacy-header">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="show_location">
+                                <span class="checkmark"></span>
+                                지역 정보 공개
+                            </label>
+                        </div>
+                        <p>내 지역 정보를 다른 사용자가 볼 수 있습니다</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-outline" onclick="resetForm()">
+                    <i class="fas fa-undo"></i> 초기화
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 저장하기
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 이미지 업로드 모달 -->
+<div class="modal" id="image-upload-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>프로필 이미지 변경</h3>
+            <button class="modal-close" onclick="closeImageModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="upload-area" id="upload-area">
+                <input type="file" id="image-input" accept="image/*" style="display: none;">
+                <div class="upload-placeholder">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>이미지를 선택하거나 여기에 드래그하세요</p>
+                    <button class="btn btn-outline" onclick="document.getElementById('image-input').click()">
+                        파일 선택
+                    </button>
+                </div>
+            </div>
+            <div class="image-preview" id="image-preview" style="display: none;">
+                <img id="preview-image" alt="미리보기">
+                <div class="preview-actions">
+                    <button class="btn btn-outline" onclick="resetImageUpload()">
+                        다시 선택
+                    </button>
+                    <button class="btn btn-primary" onclick="uploadImage()">
+                        적용하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/mypage.js') }}"></script>
+<script>
+// 글자 수 카운터
+document.getElementById('bio').addEventListener('input', function() {
+    const count = this.value.length;
+    document.getElementById('bio-count').textContent = count;
+    
+    if (count > 200) {
+        this.value = this.value.substring(0, 200);
+        document.getElementById('bio-count').textContent = 200;
+    }
+});
+
+// 프로필 이미지 변경
+function changeProfileImage() {
+    document.getElementById('image-upload-modal').classList.add('active');
+}
+
+function removeProfileImage() {
+    if (confirm('프로필 이미지를 삭제하시겠습니까?')) {
+        document.getElementById('profile-image').src = 'https://via.placeholder.com/150x150/ddd/666?text=No+Image';
+        // TODO: 실제 이미지 삭제 API 호출
+    }
+}
+
+function closeImageModal() {
+    document.getElementById('image-upload-modal').classList.remove('active');
+    resetImageUpload();
+}
+
+function resetImageUpload() {
+    document.getElementById('image-input').value = '';
+    document.getElementById('upload-area').style.display = 'block';
+    document.getElementById('image-preview').style.display = 'none';
+}
+
+// 이미지 업로드 처리
+document.getElementById('image-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // 파일 크기 체크 (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('파일 크기는 5MB 이하만 업로드 가능합니다.');
+            return;
+        }
+
+        // 파일 형식 체크
+        if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
+            alert('JPG, PNG 형식의 이미지만 업로드 가능합니다.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-image').src = e.target.result;
+            document.getElementById('upload-area').style.display = 'none';
+            document.getElementById('image-preview').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// 드래그 앤 드롭 처리
+const uploadArea = document.getElementById('upload-area');
+
+uploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.classList.add('dragover');
+});
+
+uploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+});
+
+uploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        document.getElementById('image-input').files = files;
+        document.getElementById('image-input').dispatchEvent(new Event('change'));
+    }
+});
+
+// 이미지 업로드
+function uploadImage() {
+    const file = document.getElementById('image-input').files[0];
+    if (file) {
+        // TODO: 실제 이미지 업로드 API 호출
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('profile-image').src = e.target.result;
+            closeImageModal();
+            alert('프로필 이미지가 변경되었습니다!');
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// 폼 초기화
+function resetForm() {
+    if (confirm('모든 변경사항이 초기화됩니다. 계속하시겠습니까?')) {
+        document.getElementById('profile-form').reset();
+        // 기본값으로 복원
+        document.getElementById('nickname').value = '반려동물러버';
+        document.getElementById('bio').value = '반려동물과 함께하는 일상을 사랑하는 집사입니다 🐾 \n멍멍이와 야옹이와 함께 행복한 나날을 보내고 있어요!';
+        document.getElementById('bio-count').textContent = '67';
+    }
+}
+
+// 폼 제출
+document.getElementById('profile-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('{{ url_for("mypage.profile") }}', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('프로필이 성공적으로 업데이트되었습니다!');
+            // 필요시 페이지 새로고침 또는 리다이렉트
+        } else {
+            alert('프로필 업데이트 중 오류가 발생했습니다.');
+        }
+    } catch (error) {
+        alert('프로필 업데이트 중 오류가 발생했습니다.');
+    }
+});
+
+// 모달 외부 클릭 시 닫기
+document.getElementById('image-upload-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeImageModal();
+    }
+});
+</script>
+{% endblock %}

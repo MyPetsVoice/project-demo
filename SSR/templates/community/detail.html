@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}게시글 상세보기 - 커뮤니티{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="community-detail-container">
+    <div class="community-detail-header">
+        <div class="header-actions">
+            <a href="{{ url_for('community.index') }}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> 목록으로
+            </a>
+            <!-- TODO: 작성자 확인 후 표시 -->
+            <div class="author-actions">
+                <button class="btn btn-outline btn-sm">
+                    <i class="fas fa-edit"></i> 수정
+                </button>
+                <button class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash"></i> 삭제
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <article class="post-detail">
+        <header class="post-detail-header">
+            <div class="post-meta">
+                <div class="post-tags">
+                    <span class="tag tag-walk">산책해요</span>
+                    <span class="tag tag-dog">강아지</span>
+                </div>
+                <h1 class="post-title">한강공원에서 같이 산책하실 분!</h1>
+                <div class="post-info">
+                    <div class="author-info">
+                        <div class="author-avatar">
+                            <img src="https://via.placeholder.com/40x40/ff6b6b/ffffff?text=U1" alt="작성자">
+                        </div>
+                        <div class="author-details">
+                            <span class="author-name">멍멍맘</span>
+                            <span class="post-date">2025년 1월 10일 14:30</span>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <span class="stat-item">
+                            <i class="fas fa-eye"></i> 89
+                        </span>
+                        <span class="stat-item">
+                            <i class="fas fa-heart"></i> 15
+                        </span>
+                        <span class="stat-item">
+                            <i class="fas fa-comment"></i> 8
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="post-content">
+            <div class="post-text">
+                <p>안녕하세요! 한강공원에서 함께 산책하실 분들을 모집합니다~ 🐕</p>
+                
+                <p><strong>산책 정보:</strong></p>
+                <ul>
+                    <li>날짜: 이번 주말 (1월 13일, 14일 중 택일)</li>
+                    <li>시간: 오후 2시 ~ 4시</li>
+                    <li>장소: 한강공원 뚝섬유원지 일대</li>
+                    <li>참여 반려동물: 강아지 (사회성 좋은 아이들)</li>
+                </ul>
+                
+                <p>저희 멍멍이는 골든 리트리버 3살 남아입니다. 다른 강아지들과도 잘 어울리고 활발한 성격이에요!</p>
+                
+                <p>반려동물 간 친목도 도모하고, 보호자분들끼리도 정보 교환하면서 즐거운 시간 보내요~ 관심 있으시면 댓글 남겨주세요! 💕</p>
+            </div>
+            
+            <div class="post-images">
+                <div class="image-gallery">
+                    <div class="image-item">
+                        <img src="https://via.placeholder.com/600x400/4ecdc4/ffffff?text=🐕+멍멍이" alt="멍멍이 사진">
+                    </div>
+                    <div class="image-item">
+                        <img src="https://via.placeholder.com/600x400/95a5a6/ffffff?text=🏞️+한강공원" alt="한강공원 사진">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="post-detail-footer">
+            <div class="post-actions">
+                <button class="action-btn like-btn">
+                    <i class="fas fa-heart"></i>
+                    <span>좋아요 15</span>
+                </button>
+                <button class="action-btn bookmark-btn">
+                    <i class="fas fa-bookmark"></i>
+                    <span>북마크</span>
+                </button>
+                <button class="action-btn share-btn">
+                    <i class="fas fa-share"></i>
+                    <span>공유하기</span>
+                </button>
+                <button class="action-btn report-btn">
+                    <i class="fas fa-flag"></i>
+                    <span>신고하기</span>
+                </button>
+            </div>
+        </footer>
+    </article>
+
+    <!-- 댓글 섹션 -->
+    <section class="comments-section">
+        <div class="comments-header">
+            <h3>댓글 <span class="comment-count">8</span></h3>
+            <div class="comment-sort">
+                <select>
+                    <option value="latest">최신순</option>
+                    <option value="oldest">작성순</option>
+                    <option value="likes">좋아요순</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="comment-form">
+            <div class="comment-input-wrapper">
+                <div class="comment-avatar">
+                    <img src="https://via.placeholder.com/36x36/666/ffffff?text=Me" alt="내 프로필">
+                </div>
+                <div class="comment-input-area">
+                    <textarea placeholder="댓글을 입력하세요..." rows="3"></textarea>
+                    <div class="comment-actions">
+                        <button class="btn btn-outline btn-sm">취소</button>
+                        <button class="btn btn-primary btn-sm">댓글 작성</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comments-list">
+            <div class="comment-item">
+                <div class="comment-avatar">
+                    <img src="https://via.placeholder.com/36x36/e74c3c/ffffff?text=U2" alt="댓글 작성자">
+                </div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-author">강아지아빠</span>
+                        <span class="comment-date">30분 전</span>
+                        <div class="comment-menu">
+                            <button class="menu-btn">⋯</button>
+                        </div>
+                    </div>
+                    <p class="comment-text">저희도 참여하고 싶어요! 리트리버 2살 여아인데 다른 강아지들과 잘 놀아요~ 시간대도 딱 좋네요!</p>
+                    <div class="comment-actions">
+                        <button class="comment-like">
+                            <i class="fas fa-heart"></i> 3
+                        </button>
+                        <button class="comment-reply">답글</button>
+                    </div>
+                    
+                    <!-- 답글 -->
+                    <div class="reply-item">
+                        <div class="comment-avatar">
+                            <img src="https://via.placeholder.com/32x32/ff6b6b/ffffff?text=U1" alt="원글 작성자">
+                        </div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <span class="comment-author">멍멍맘</span>
+                                <span class="author-badge">작성자</span>
+                                <span class="comment-date">20분 전</span>
+                            </div>
+                            <p class="comment-text">@강아지아빠 좋아요! 연락처 남겨주시면 자세한 내용 공유드릴게요~</p>
+                            <div class="comment-actions">
+                                <button class="comment-like">
+                                    <i class="fas fa-heart"></i> 1
+                                </button>
+                                <button class="comment-reply">답글</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comment-item">
+                <div class="comment-avatar">
+                    <img src="https://via.placeholder.com/36x36/9b59b6/ffffff?text=U3" alt="댓글 작성자">
+                </div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-author">펫러버123</span>
+                        <span class="comment-date">1시간 전</span>
+                        <div class="comment-menu">
+                            <button class="menu-btn">⋯</button>
+                        </div>
+                    </div>
+                    <p class="comment-text">한강공원 산책 모임 너무 좋은 아이디어네요! 저는 이번엔 참여 못하지만 다음에도 이런 모임 있으면 알려주세요 ㅎㅎ</p>
+                    <div class="comment-actions">
+                        <button class="comment-like">
+                            <i class="fas fa-heart"></i> 5
+                        </button>
+                        <button class="comment-reply">답글</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comment-item">
+                <div class="comment-avatar">
+                    <img src="https://via.placeholder.com/36x36/f39c12/ffffff?text=U4" alt="댓글 작성자">
+                </div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-author">도그맘</span>
+                        <span class="comment-date">2시간 전</span>
+                        <div class="comment-menu">
+                            <button class="menu-btn">⋯</button>
+                        </div>
+                    </div>
+                    <p class="comment-text">우리 복실이도 골든 리트리버인데 같이 놀면 재밌을 것 같아요! 개인적으로 연락드릴게요~</p>
+                    <div class="comment-actions">
+                        <button class="comment-like">
+                            <i class="fas fa-heart"></i> 2
+                        </button>
+                        <button class="comment-reply">답글</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comments-pagination">
+            <button class="btn btn-outline">댓글 더보기</button>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/community.js') }}"></script>
+<script>
+// 좋아요 버튼 처리
+document.querySelector('.like-btn').addEventListener('click', function() {
+    this.classList.toggle('liked');
+    // TODO: 실제 좋아요 API 호출
+});
+
+// 공유하기 버튼 처리
+document.querySelector('.share-btn').addEventListener('click', function() {
+    if (navigator.share) {
+        navigator.share({
+            title: '한강공원에서 같이 산책하실 분! - MyPet\'s Voice',
+            text: '한강공원에서 함께 산책하실 분들을 모집합니다~',
+            url: window.location.href
+        });
+    } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert('링크가 클립보드에 복사되었습니다!');
+    }
+});
+
+// 댓글 작성 처리
+document.querySelector('.comment-form .btn-primary').addEventListener('click', function() {
+    const textarea = document.querySelector('.comment-form textarea');
+    const content = textarea.value.trim();
+    
+    if (!content) {
+        alert('댓글 내용을 입력해주세요.');
+        return;
+    }
+    
+    // TODO: 실제 댓글 작성 API 호출
+    alert('댓글이 작성되었습니다!');
+    textarea.value = '';
+});
+
+// 댓글 좋아요 처리
+document.querySelectorAll('.comment-like').forEach(btn => {
+    btn.addEventListener('click', function() {
+        this.classList.toggle('liked');
+        // TODO: 실제 댓글 좋아요 API 호출
+    });
+});
+
+// 답글 버튼 처리
+document.querySelectorAll('.comment-reply').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // TODO: 답글 입력창 토글
+        alert('답글 기능 구현 예정');
+    });
+});
+</script>
+{% endblock %}

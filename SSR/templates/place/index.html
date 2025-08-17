@@ -1,0 +1,417 @@
+{% extends "base.html" %}
+
+{% block title %}플레이스 - MyPet's Voice{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/place.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="place-container">
+    <div class="place-header">
+        <h2>반려동물 동반 가능 장소</h2>
+        <p>반려동물과 함께 즐길 수 있는 장소들을 찾아보세요</p>
+    </div>
+
+    <div class="search-section">
+        <div class="search-bar">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="place-search" placeholder="지역, 카페, 식당, 펜션 등을 검색하세요">
+                <button class="search-btn" id="search-btn">검색</button>
+            </div>
+        </div>
+        
+        <div class="search-filters">
+            <div class="filter-group">
+                <label>지역</label>
+                <select id="region-filter">
+                    <option value="">전체 지역</option>
+                    <option value="seoul">서울</option>
+                    <option value="gyeonggi">경기</option>
+                    <option value="incheon">인천</option>
+                    <option value="busan">부산</option>
+                    <option value="daegu">대구</option>
+                    <option value="daejeon">대전</option>
+                    <option value="gwangju">광주</option>
+                    <option value="ulsan">울산</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>카테고리</label>
+                <select id="category-filter">
+                    <option value="">전체 카테고리</option>
+                    <option value="cafe">카페</option>
+                    <option value="restaurant">음식점</option>
+                    <option value="park">공원</option>
+                    <option value="accommodation">숙박</option>
+                    <option value="hospital">동물병원</option>
+                    <option value="grooming">미용실</option>
+                    <option value="shopping">쇼핑</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>반려동물</label>
+                <select id="pet-filter">
+                    <option value="">전체</option>
+                    <option value="dog">강아지</option>
+                    <option value="cat">고양이</option>
+                    <option value="small-pet">소동물</option>
+                </select>
+            </div>
+            
+            <button class="filter-reset" id="reset-filters">
+                <i class="fas fa-undo"></i> 초기화
+            </button>
+        </div>
+    </div>
+
+    <div class="content-layout">
+        <!-- 지도 영역 -->
+        <div class="map-section">
+            <div id="map-container">
+                <!-- TODO: 실제 지도 API 연동 -->
+                <div class="map-placeholder">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <p>지도를 불러오는 중...</p>
+                </div>
+            </div>
+            <div class="map-controls">
+                <button class="map-control-btn" id="current-location">
+                    <i class="fas fa-crosshairs"></i>
+                    현재 위치
+                </button>
+                <button class="map-control-btn" id="toggle-view">
+                    <i class="fas fa-list"></i>
+                    목록 보기
+                </button>
+            </div>
+        </div>
+
+        <!-- 장소 목록 -->
+        <div class="places-section">
+            <div class="places-header">
+                <h3>검색 결과 <span class="result-count">156</span>곳</h3>
+                <div class="sort-options">
+                    <select id="sort-select">
+                        <option value="distance">거리순</option>
+                        <option value="rating">평점순</option>
+                        <option value="reviews">리뷰순</option>
+                        <option value="recent">최근 등록순</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="places-list" id="places-list">
+                <!-- 샘플 장소 데이터 -->
+                <div class="place-card">
+                    <div class="place-image">
+                        <img src="https://via.placeholder.com/200x150/4ecdc4/ffffff?text=카페" alt="펫프렌들리 카페">
+                        <div class="place-badge">
+                            <span class="badge badge-cafe">카페</span>
+                        </div>
+                    </div>
+                    <div class="place-info">
+                        <h4 class="place-name">댕댕이 카페</h4>
+                        <p class="place-address">서울시 강남구 신사동 123-45</p>
+                        <div class="place-tags">
+                            <span class="tag">🐕 강아지 동반</span>
+                            <span class="tag">🅿️ 주차 가능</span>
+                            <span class="tag">🏡 실내</span>
+                        </div>
+                        <div class="place-meta">
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.5</span>
+                                <span class="review-count">(127)</span>
+                            </div>
+                            <div class="distance">850m</div>
+                        </div>
+                        <p class="place-description">반려견과 함께 즐길 수 있는 아늑한 카페. 강아지 전용 메뉴와 놀이공간이 있어요.</p>
+                    </div>
+                    <div class="place-actions">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-directions"></i> 길찾기
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-phone"></i> 전화
+                        </button>
+                    </div>
+                </div>
+
+                <div class="place-card">
+                    <div class="place-image">
+                        <img src="https://via.placeholder.com/200x150/e74c3c/ffffff?text=식당" alt="펫프렌들리 식당">
+                        <div class="place-badge">
+                            <span class="badge badge-restaurant">음식점</span>
+                        </div>
+                    </div>
+                    <div class="place-info">
+                        <h4 class="place-name">펫 가든 레스토랑</h4>
+                        <p class="place-address">서울시 강남구 청담동 67-89</p>
+                        <div class="place-tags">
+                            <span class="tag">🐕 강아지 동반</span>
+                            <span class="tag">🐱 고양이 동반</span>
+                            <span class="tag">🌿 야외석</span>
+                        </div>
+                        <div class="place-meta">
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.2</span>
+                                <span class="review-count">(89)</span>
+                            </div>
+                            <div class="distance">1.2km</div>
+                        </div>
+                        <p class="place-description">넓은 야외 테라스에서 반려동물과 함께 식사할 수 있는 레스토랑입니다.</p>
+                    </div>
+                    <div class="place-actions">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-directions"></i> 길찾기
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-phone"></i> 전화
+                        </button>
+                    </div>
+                </div>
+
+                <div class="place-card">
+                    <div class="place-image">
+                        <img src="https://via.placeholder.com/200x150/2ecc71/ffffff?text=공원" alt="반려동물 공원">
+                        <div class="place-badge">
+                            <span class="badge badge-park">공원</span>
+                        </div>
+                    </div>
+                    <div class="place-info">
+                        <h4 class="place-name">한강공원 뚝섬지구</h4>
+                        <p class="place-address">서울시 광진구 자양동 한강공원</p>
+                        <div class="place-tags">
+                            <span class="tag">🐕 강아지 동반</span>
+                            <span class="tag">🚫 목줄 필수</span>
+                            <span class="tag">🌳 야외</span>
+                        </div>
+                        <div class="place-meta">
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.7</span>
+                                <span class="review-count">(234)</span>
+                            </div>
+                            <div class="distance">2.1km</div>
+                        </div>
+                        <p class="place-description">넓은 잔디밭과 산책로가 있어 반려견과 뛰어놀기 좋은 공원입니다.</p>
+                    </div>
+                    <div class="place-actions">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-directions"></i> 길찾기
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-info-circle"></i> 정보
+                        </button>
+                    </div>
+                </div>
+
+                <div class="place-card">
+                    <div class="place-image">
+                        <img src="https://via.placeholder.com/200x150/9b59b6/ffffff?text=병원" alt="동물병원">
+                        <div class="place-badge">
+                            <span class="badge badge-hospital">병원</span>
+                        </div>
+                    </div>
+                    <div class="place-info">
+                        <h4 class="place-name">사랑 동물병원</h4>
+                        <p class="place-address">서울시 강남구 논현동 45-12</p>
+                        <div class="place-tags">
+                            <span class="tag">🏥 24시간 진료</span>
+                            <span class="tag">🚗 주차 가능</span>
+                            <span class="tag">💳 카드 결제</span>
+                        </div>
+                        <div class="place-meta">
+                            <div class="rating">
+                                <i class="fas fa-star"></i>
+                                <span>4.8</span>
+                                <span class="review-count">(156)</span>
+                            </div>
+                            <div class="distance">950m</div>
+                        </div>
+                        <p class="place-description">경험 많은 수의사선생님이 계시는 신뢰할 수 있는 동물병원입니다.</p>
+                    </div>
+                    <div class="place-actions">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="fas fa-directions"></i> 길찾기
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-phone"></i> 전화
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div class="pagination">
+                <button class="page-btn" disabled>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <span class="page-dots">...</span>
+                <button class="page-btn">10</button>
+                <button class="page-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 빈 상태 -->
+    <div class="empty-state" style="display: none;">
+        <div class="empty-icon">🗺️</div>
+        <h3>검색 결과가 없어요</h3>
+        <p>다른 키워드로 검색해보시거나 필터를 조정해보세요</p>
+        <button class="btn btn-primary" onclick="document.getElementById('place-search').focus()">
+            다시 검색하기
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/place.js') }}"></script>
+<script>
+// 검색 기능
+document.getElementById('search-btn').addEventListener('click', function() {
+    const query = document.getElementById('place-search').value.trim();
+    if (query) {
+        searchPlaces(query);
+    }
+});
+
+document.getElementById('place-search').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        const query = this.value.trim();
+        if (query) {
+            searchPlaces(query);
+        }
+    }
+});
+
+// 필터 변경 처리
+document.querySelectorAll('#region-filter, #category-filter, #pet-filter').forEach(select => {
+    select.addEventListener('change', function() {
+        applyFilters();
+    });
+});
+
+// 필터 초기화
+document.getElementById('reset-filters').addEventListener('click', function() {
+    document.getElementById('region-filter').value = '';
+    document.getElementById('category-filter').value = '';
+    document.getElementById('pet-filter').value = '';
+    document.getElementById('place-search').value = '';
+    applyFilters();
+});
+
+// 정렬 변경
+document.getElementById('sort-select').addEventListener('change', function() {
+    const sortBy = this.value;
+    sortPlaces(sortBy);
+});
+
+// 현재 위치 버튼
+document.getElementById('current-location').addEventListener('click', function() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            // TODO: 지도 API 연동하여 현재 위치로 이동
+            alert(`현재 위치: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
+        }, function(error) {
+            alert('위치 정보를 가져올 수 없습니다.');
+        });
+    } else {
+        alert('이 브라우저는 위치 서비스를 지원하지 않습니다.');
+    }
+});
+
+// 뷰 토글
+document.getElementById('toggle-view').addEventListener('click', function() {
+    const mapSection = document.querySelector('.map-section');
+    const placesSection = document.querySelector('.places-section');
+    
+    if (mapSection.style.display === 'none') {
+        mapSection.style.display = 'block';
+        placesSection.style.flex = '1';
+        this.innerHTML = '<i class="fas fa-list"></i> 목록 보기';
+    } else {
+        mapSection.style.display = 'none';
+        placesSection.style.flex = 'none';
+        placesSection.style.width = '100%';
+        this.innerHTML = '<i class="fas fa-map"></i> 지도 보기';
+    }
+});
+
+// 검색 함수
+function searchPlaces(query) {
+    // TODO: 실제 검색 API 호출
+    console.log('검색어:', query);
+    // 임시로 로딩 표시
+    showLoading();
+    setTimeout(() => {
+        hideLoading();
+        // 검색 결과 업데이트
+    }, 1000);
+}
+
+// 필터 적용 함수
+function applyFilters() {
+    const region = document.getElementById('region-filter').value;
+    const category = document.getElementById('category-filter').value;
+    const petType = document.getElementById('pet-filter').value;
+    
+    // TODO: 필터 적용 로직 구현
+    console.log('필터:', { region, category, petType });
+}
+
+// 정렬 함수
+function sortPlaces(sortBy) {
+    // TODO: 정렬 로직 구현
+    console.log('정렬 기준:', sortBy);
+}
+
+// 로딩 표시/숨김
+function showLoading() {
+    document.querySelector('.places-list').style.opacity = '0.5';
+}
+
+function hideLoading() {
+    document.querySelector('.places-list').style.opacity = '1';
+}
+
+// 길찾기 버튼 처리
+document.querySelectorAll('.place-actions .btn-outline').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const placeCard = this.closest('.place-card');
+        const placeName = placeCard.querySelector('.place-name').textContent;
+        const address = placeCard.querySelector('.place-address').textContent;
+        
+        // TODO: 실제 지도 앱으로 연결
+        alert(`${placeName}으로 길찾기\n주소: ${address}`);
+    });
+});
+
+// 전화 버튼 처리
+document.querySelectorAll('.place-actions .btn-primary').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const btnText = this.textContent.trim();
+        if (btnText.includes('전화')) {
+            // TODO: 실제 전화번호로 연결
+            alert('전화 연결 기능');
+        } else if (btnText.includes('정보')) {
+            // TODO: 상세 정보 모달 표시
+            alert('상세 정보 표시');
+        }
+    });
+});
+</script>
+{% endblock %}

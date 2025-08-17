@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}일기 작성 - MyPet's Voice{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/diary.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="diary-create-container">
+    <div class="diary-create-header">
+        <h2>새 일기 작성</h2>
+        <div class="header-actions">
+            <a href="{{ url_for('diary.index') }}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> 목록으로
+            </a>
+        </div>
+    </div>
+
+    <form id="diary-form" class="diary-form">
+        <div class="form-section">
+            <h3>기본 정보</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pet-select">반려동물 선택 *</label>
+                    <select id="pet-select" name="pet_id" required>
+                        <option value="">반려동물을 선택하세요</option>
+                        <!-- TODO: 반려동물 목록 동적 로드 -->
+                        <option value="1">멍멍이 (개)</option>
+                        <option value="2">야옹이 (고양이)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="diary-date">날짜 *</label>
+                    <input type="date" id="diary-date" name="diary_date" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="weather">날씨</label>
+                    <select id="weather" name="weather">
+                        <option value="">날씨 선택</option>
+                        <option value="sunny">☀️ 맑음</option>
+                        <option value="cloudy">☁️ 흐림</option>
+                        <option value="rainy">🌧️ 비</option>
+                        <option value="snowy">❄️ 눈</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mood">기분</label>
+                    <select id="mood" name="mood">
+                        <option value="">기분 선택</option>
+                        <option value="happy">😊 행복해요</option>
+                        <option value="excited">😆 신나요</option>
+                        <option value="calm">😌 평온해요</option>
+                        <option value="sad">😢 슬퍼요</option>
+                        <option value="tired">😴 피곤해요</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>일기 내용</h3>
+            <div class="form-group">
+                <label for="diary-title">제목 *</label>
+                <input type="text" id="diary-title" name="title" required 
+                       placeholder="오늘의 일기 제목을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label for="diary-content">내용 *</label>
+                <textarea id="diary-content" name="content" required 
+                          placeholder="반려동물의 하루를 자세히 기록해주세요..."></textarea>
+                <div class="content-help">
+                    <small>💡 팁: 반려동물의 관점에서 작성해보세요!</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>사진 및 설정</h3>
+            <div class="form-group">
+                <label for="diary-images">사진 첨부</label>
+                <div class="image-upload-area" id="image-upload-area">
+                    <input type="file" id="diary-images" name="images" multiple accept="image/*">
+                    <div class="upload-placeholder">
+                        <i class="fas fa-camera"></i>
+                        <p>사진을 업로드하세요</p>
+                        <small>최대 5장까지 업로드 가능</small>
+                    </div>
+                </div>
+                <div class="image-preview" id="image-preview"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="is_public" value="1">
+                    <span class="checkmark"></span>
+                    다른 사용자들과 공유하기
+                </label>
+                <small class="help-text">체크하면 커뮤니티에서 다른 사람들이 볼 수 있어요</small>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn btn-outline" onclick="history.back()">
+                취소
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> 일기 저장
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/diary.js') }}"></script>
+<script>
+// 오늘 날짜로 기본값 설정
+document.getElementById('diary-date').valueAsDate = new Date();
+
+// 이미지 업로드 처리
+document.getElementById('diary-images').addEventListener('change', function(e) {
+    const files = e.target.files;
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = '';
+    
+    for (let i = 0; i < Math.min(files.length, 5); i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'image-preview-item';
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="미리보기">
+                <button type="button" class="remove-image" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            preview.appendChild(div);
+        };
+        
+        reader.readAsDataURL(file);
+    }
+});
+
+// 폼 제출 처리
+document.getElementById('diary-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('{{ url_for("diary.create") }}', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('일기가 성공적으로 저장되었습니다!');
+            window.location.href = '{{ url_for("diary.index") }}';
+        } else {
+            alert('일기 저장 중 오류가 발생했습니다.');
+        }
+    } catch (error) {
+        alert('일기 저장 중 오류가 발생했습니다.');
+    }
+});
+</script>
+{% endblock %}

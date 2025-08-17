@@ -1,0 +1,63 @@
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{{ url_for('chat.index') }}" class="nav-link">
+            <div class="nav-logo">
+                <i class="fas fa-paw"></i>
+                <span>MyPet's Voice</span>
+            </div>
+        </a>
+        
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="nav-menu" id="nav-menu">
+            <a href="{{ url_for('diary.index') }}" 
+               class="nav-link {% if request.endpoint and 'diary' in request.endpoint %}active{% endif %}">
+                너의 일기장
+            </a>
+            <a href="{{ url_for('community.index') }}" 
+               class="nav-link {% if request.endpoint and 'community' in request.endpoint %}active{% endif %}">
+                커뮤니티
+            </a>
+            <a href="{{ url_for('place.index') }}" 
+               class="nav-link {% if request.endpoint and 'place' in request.endpoint %}active{% endif %}">
+                플레이스
+            </a>
+            <a href="{{ url_for('tourspot.index') }}" 
+               class="nav-link {% if request.endpoint and 'tourspot' in request.endpoint %}active{% endif %}">
+                투어스팟
+            </a>
+            <a href="{{ url_for('dailycare.index') }}" 
+               class="nav-link {% if request.endpoint and 'dailycare' in request.endpoint %}active{% endif %}">
+                데일리케어
+            </a>
+            <a href="{{ url_for('mypage.index') }}" 
+               class="nav-link {% if request.endpoint and 'mypage' in request.endpoint %}active{% endif %}">
+                마이페이지
+            </a>
+        </div>
+
+        <div class="nav-user">
+            {% if session.user_id %}
+                <div class="user-menu">
+                    <button class="user-avatar" id="user-menu-btn">
+                        <img src="{{ session.user_avatar or url_for('static', filename='images/default-avatar.png') }}" 
+                             alt="프로필">
+                    </button>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <a href="{{ url_for('mypage.index') }}">마이페이지</a>
+                        <a href="{{ url_for('auth.logout') }}">로그아웃</a>
+                    </div>
+                </div>
+            {% else %}
+                <button class="btn btn-primary" id="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> 로그인
+                </button>
+                <button class="btn btn-outline" id="signup-btn">
+                    회원가입
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</nav>

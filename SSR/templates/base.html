@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MyPet's Voice{% endblock %}</title>
+    
+    <!-- 공통 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+    
+    <!-- 페이지별 CSS -->
+    {% block styles %}{% endblock %}
+    
+    <!-- 페이지별 메타 태그 -->
+    {% block meta %}{% endblock %}
+</head>
+<body>
+    <!-- 네비게이션 include -->
+    {% include 'components/navbar.html' %}
+    
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="main-container">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- 푸터 include -->
+    {% include 'components/footer.html' %}
+    
+    <!-- 공통 JavaScript -->
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/navbar.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    
+    <!-- 페이지별 JavaScript -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,484 @@
+{% extends "base.html" %}
+
+{% block title %}투어스팟 - MyPet's Voice{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/tourspot.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="tourspot-container">
+    <div class="tourspot-header">
+        <h2>반려동물 여행지</h2>
+        <p>반려동물과 함께 떠나는 특별한 여행을 계획해보세요</p>
+    </div>
+
+    <!-- 검색 및 필터 섹션 -->
+    <div class="search-section">
+        <div class="search-bar">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search"></i>
+                <input type="text" id="tourspot-search" placeholder="여행지, 지역명을 검색하세요">
+                <button class="search-btn" id="search-btn">검색</button>
+            </div>
+        </div>
+        
+        <div class="search-filters">
+            <div class="filter-group">
+                <label>지역</label>
+                <select id="region-filter">
+                    <option value="">전국</option>
+                    <option value="seoul">서울/경기</option>
+                    <option value="gangwon">강원도</option>
+                    <option value="chungcheong">충청도</option>
+                    <option value="jeolla">전라도</option>
+                    <option value="gyeongsang">경상도</option>
+                    <option value="jeju">제주도</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>여행 유형</label>
+                <select id="type-filter">
+                    <option value="">전체</option>
+                    <option value="nature">자연 관광</option>
+                    <option value="city">도시 관광</option>
+                    <option value="beach">해변</option>
+                    <option value="mountain">산/계곡</option>
+                    <option value="theme-park">테마파크</option>
+                    <option value="camping">캠핑</option>
+                    <option value="accommodation">펜션/숙박</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>계절</label>
+                <select id="season-filter">
+                    <option value="">사계절</option>
+                    <option value="spring">봄</option>
+                    <option value="summer">여름</option>
+                    <option value="autumn">가을</option>
+                    <option value="winter">겨울</option>
+                </select>
+            </div>
+            
+            <button class="filter-reset" id="reset-filters">
+                <i class="fas fa-undo"></i> 초기화
+            </button>
+        </div>
+    </div>
+
+    <!-- 추천 투어스팟 섹션 -->
+    <div class="featured-section">
+        <h3>이번 주 추천 여행지</h3>
+        <div class="featured-slider">
+            <div class="featured-card">
+                <div class="featured-image">
+                    <img src="https://via.placeholder.com/400x250/4ecdc4/ffffff?text=제주도" alt="제주도">
+                    <div class="featured-badge">HOT</div>
+                </div>
+                <div class="featured-content">
+                    <h4>제주도 올레길</h4>
+                    <p>반려견과 함께 걷는 아름다운 제주 올레길</p>
+                    <div class="featured-tags">
+                        <span class="tag">🐕 강아지 동반</span>
+                        <span class="tag">🌊 해변</span>
+                        <span class="tag">🚶‍♂️ 도보 여행</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="featured-card">
+                <div class="featured-image">
+                    <img src="https://via.placeholder.com/400x250/e74c3c/ffffff?text=강원도" alt="강원도">
+                    <div class="featured-badge">NEW</div>
+                </div>
+                <div class="featured-content">
+                    <h4>강원도 평창</h4>
+                    <p>눈 덮인 평창에서 반려동물과 겨울 여행</p>
+                    <div class="featured-tags">
+                        <span class="tag">❄️ 겨울</span>
+                        <span class="tag">🏔️ 산</span>
+                        <span class="tag">🏨 펜션</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="featured-card">
+                <div class="featured-image">
+                    <img src="https://via.placeholder.com/400x250/2ecc71/ffffff?text=경주" alt="경주">
+                </div>
+                <div class="featured-content">
+                    <h4>경주 역사 탐방</h4>
+                    <p>천년 고도 경주에서 반려동물과 역사 여행</p>
+                    <div class="featured-tags">
+                        <span class="tag">🏛️ 역사</span>
+                        <span class="tag">🌸 봄</span>
+                        <span class="tag">📸 포토스팟</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 투어스팟 목록 -->
+    <div class="tourspot-list-section">
+        <div class="list-header">
+            <h3>여행지 목록</h3>
+            <div class="sort-options">
+                <select id="sort-select">
+                    <option value="popular">인기순</option>
+                    <option value="rating">평점순</option>
+                    <option value="distance">거리순</option>
+                    <option value="recent">최신순</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="tourspot-grid" id="tourspot-grid">
+            <!-- 투어스팟 카드들 -->
+            <div class="tourspot-card">
+                <div class="tourspot-image">
+                    <img src="https://via.placeholder.com/300x200/ff6b6b/ffffff?text=한강공원" alt="한강공원">
+                    <div class="image-overlay">
+                        <button class="bookmark-btn">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="tourspot-content">
+                    <div class="tourspot-header">
+                        <h4 class="tourspot-name">한강공원 뚝섬지구</h4>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>4.6</span>
+                        </div>
+                    </div>
+                    <p class="tourspot-location">서울특별시 광진구</p>
+                    <p class="tourspot-description">도심 속에서 반려견과 함께 즐길 수 있는 넓은 공원. 산책로와 잔디밭이 잘 조성되어 있어요.</p>
+                    <div class="tourspot-tags">
+                        <span class="tag">🐕 강아지</span>
+                        <span class="tag">🌳 공원</span>
+                        <span class="tag">🚶‍♂️ 산책</span>
+                        <span class="tag">🅿️ 주차</span>
+                    </div>
+                    <div class="tourspot-meta">
+                        <span class="distance">2.3km</span>
+                        <span class="reviews">리뷰 234개</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tourspot-card">
+                <div class="tourspot-image">
+                    <img src="https://via.placeholder.com/300x200/9b59b6/ffffff?text=강릉해변" alt="강릉해변">
+                    <div class="image-overlay">
+                        <button class="bookmark-btn">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="tourspot-content">
+                    <div class="tourspot-header">
+                        <h4 class="tourspot-name">강릉 경포해변</h4>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>4.8</span>
+                        </div>
+                    </div>
+                    <p class="tourspot-location">강원도 강릉시</p>
+                    <p class="tourspot-description">반려견과 함께 뛰어놀 수 있는 아름다운 해변. 펫 친화적인 숙박시설도 많아요.</p>
+                    <div class="tourspot-tags">
+                        <span class="tag">🐕 강아지</span>
+                        <span class="tag">🌊 해변</span>
+                        <span class="tag">🏨 숙박</span>
+                        <span class="tag">🍽️ 맛집</span>
+                    </div>
+                    <div class="tourspot-meta">
+                        <span class="distance">156km</span>
+                        <span class="reviews">리뷰 189개</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tourspot-card">
+                <div class="tourspot-image">
+                    <img src="https://via.placeholder.com/300x200/f39c12/ffffff?text=남산타워" alt="남산타워">
+                    <div class="image-overlay">
+                        <button class="bookmark-btn">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="tourspot-content">
+                    <div class="tourspot-header">
+                        <h4 class="tourspot-name">남산공원 & N서울타워</h4>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>4.4</span>
+                        </div>
+                    </div>
+                    <p class="tourspot-location">서울특별시 중구</p>
+                    <p class="tourspot-description">서울의 대표 관광지에서 반려동물과 함께하는 도심 산책. 야경이 아름다워요.</p>
+                    <div class="tourspot-tags">
+                        <span class="tag">🐕 강아지</span>
+                        <span class="tag">🌃 야경</span>
+                        <span class="tag">📸 포토</span>
+                        <span class="tag">🚠 케이블카</span>
+                    </div>
+                    <div class="tourspot-meta">
+                        <span class="distance">8.7km</span>
+                        <span class="reviews">리뷰 456개</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tourspot-card">
+                <div class="tourspot-image">
+                    <img src="https://via.placeholder.com/300x200/1abc9c/ffffff?text=설악산" alt="설악산">
+                    <div class="image-overlay">
+                        <button class="bookmark-btn">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="tourspot-content">
+                    <div class="tourspot-header">
+                        <h4 class="tourspot-name">설악산 국립공원</h4>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>4.7</span>
+                        </div>
+                    </div>
+                    <p class="tourspot-location">강원도 속초시</p>
+                    <p class="tourspot-description">웅장한 자연 속에서 반려견과 함께하는 트레킹. 다양한 코스가 준비되어 있어요.</p>
+                    <div class="tourspot-tags">
+                        <span class="tag">🐕 강아지</span>
+                        <span class="tag">🏔️ 산</span>
+                        <span class="tag">🥾 등산</span>
+                        <span class="tag">🍃 자연</span>
+                    </div>
+                    <div class="tourspot-meta">
+                        <span class="distance">198km</span>
+                        <span class="reviews">리뷰 342개</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tourspot-card">
+                <div class="tourspot-image">
+                    <img src="https://via.placeholder.com/300x200/e67e22/ffffff?text=부산해운대" alt="부산해운대">
+                    <div class="image-overlay">
+                        <button class="bookmark-btn">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="tourspot-content">
+                    <div class="tourspot-header">
+                        <h4 class="tourspot-name">부산 해운대해변</h4>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>4.5</span>
+                        </div>
+                    </div>
+                    <p class="tourspot-location">부산광역시 해운대구</p>
+                    <p class="tourspot-description">반려동물과 함께 즐기는 해변 휴양지. 펫 카페와 맛집이 많아 편리해요.</p>
+                    <div class="tourspot-tags">
+                        <span class="tag">🐕 강아지</span>
+                        <span class="tag">🌊 해변</span>
+                        <span class="tag">🏖️ 리조트</span>
+                        <span class="tag">🦀 해산물</span>
+                    </div>
+                    <div class="tourspot-meta">
+                        <span class="distance">398km</span>
+                        <span class="reviews">리뷰 267개</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tourspot-card">
+                <div class="tourspot-image">
+                    <img src="https://via.placeholder.com/300x200/8e44ad/ffffff?text=전주한옥마을" alt="전주한옥마을">
+                    <div class="image-overlay">
+                        <button class="bookmark-btn">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="tourspot-content">
+                    <div class="tourspot-header">
+                        <h4 class="tourspot-name">전주 한옥마을</h4>
+                        <div class="rating">
+                            <i class="fas fa-star"></i>
+                            <span>4.3</span>
+                        </div>
+                    </div>
+                    <p class="tourspot-location">전라북도 전주시</p>
+                    <p class="tourspot-description">전통 한옥과 맛있는 음식을 반려동물과 함께 즐길 수 있는 문화 여행지예요.</p>
+                    <div class="tourspot-tags">
+                        <span class="tag">🐕 강아지</span>
+                        <span class="tag">🏠 한옥</span>
+                        <span class="tag">🍜 맛집</span>
+                        <span class="tag">🎭 문화</span>
+                    </div>
+                    <div class="tourspot-meta">
+                        <span class="distance">289km</span>
+                        <span class="reviews">리뷰 178개</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination">
+            <button class="page-btn" disabled>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">3</button>
+            <span class="page-dots">...</span>
+            <button class="page-btn">8</button>
+            <button class="page-btn">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 빈 상태 -->
+    <div class="empty-state" style="display: none;">
+        <div class="empty-icon">🗺️</div>
+        <h3>검색 결과가 없어요</h3>
+        <p>다른 검색어를 시도해보시거나 필터를 조정해보세요</p>
+        <button class="btn btn-primary" onclick="document.getElementById('tourspot-search').focus()">
+            다시 검색하기
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/tourspot.js') }}"></script>
+<script>
+// 검색 기능
+document.getElementById('search-btn').addEventListener('click', function() {
+    const query = document.getElementById('tourspot-search').value.trim();
+    if (query) {
+        searchTourspots(query);
+    }
+});
+
+document.getElementById('tourspot-search').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        const query = this.value.trim();
+        if (query) {
+            searchTourspots(query);
+        }
+    }
+});
+
+// 필터 변경 처리
+document.querySelectorAll('#region-filter, #type-filter, #season-filter').forEach(select => {
+    select.addEventListener('change', function() {
+        applyFilters();
+    });
+});
+
+// 필터 초기화
+document.getElementById('reset-filters').addEventListener('click', function() {
+    document.getElementById('region-filter').value = '';
+    document.getElementById('type-filter').value = '';
+    document.getElementById('season-filter').value = '';
+    document.getElementById('tourspot-search').value = '';
+    applyFilters();
+});
+
+// 정렬 변경
+document.getElementById('sort-select').addEventListener('change', function() {
+    const sortBy = this.value;
+    sortTourspots(sortBy);
+});
+
+// 북마크 버튼 처리
+document.querySelectorAll('.bookmark-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        this.classList.toggle('bookmarked');
+        
+        if (this.classList.contains('bookmarked')) {
+            this.innerHTML = '<i class="fas fa-bookmark"></i>';
+            // TODO: 북마크 저장 API 호출
+        } else {
+            this.innerHTML = '<i class="far fa-bookmark"></i>';
+            // TODO: 북마크 삭제 API 호출
+        }
+    });
+});
+
+// 투어스팟 카드 클릭 처리
+document.querySelectorAll('.tourspot-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+        if (e.target.closest('.bookmark-btn')) return;
+        
+        const tourspotName = this.querySelector('.tourspot-name').textContent;
+        // TODO: 상세 페이지로 이동
+        alert(`${tourspotName} 상세보기`);
+    });
+});
+
+// 추천 슬라이더 (간단한 구현)
+let currentSlide = 0;
+const slides = document.querySelectorAll('.featured-card');
+const totalSlides = slides.length;
+
+function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    updateSlider();
+}
+
+function updateSlider() {
+    const slider = document.querySelector('.featured-slider');
+    const translateX = -currentSlide * (100 / totalSlides);
+    slider.style.transform = `translateX(${translateX}%)`;
+}
+
+// 자동 슬라이드 (5초마다)
+setInterval(nextSlide, 5000);
+
+// 검색 함수
+function searchTourspots(query) {
+    console.log('검색어:', query);
+    // TODO: 실제 검색 API 호출
+    showLoading();
+    setTimeout(() => {
+        hideLoading();
+    }, 1000);
+}
+
+// 필터 적용 함수
+function applyFilters() {
+    const region = document.getElementById('region-filter').value;
+    const type = document.getElementById('type-filter').value;
+    const season = document.getElementById('season-filter').value;
+    
+    console.log('필터:', { region, type, season });
+    // TODO: 필터 적용 로직 구현
+}
+
+// 정렬 함수
+function sortTourspots(sortBy) {
+    console.log('정렬 기준:', sortBy);
+    // TODO: 정렬 로직 구현
+}
+
+// 로딩 표시/숨김
+function showLoading() {
+    document.querySelector('.tourspot-grid').style.opacity = '0.5';
+}
+
+function hideLoading() {
+    document.querySelector('.tourspot-grid').style.opacity = '1';
+}
+</script>
+{% endblock %}

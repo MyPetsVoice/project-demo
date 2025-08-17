@@ -1,0 +1,528 @@
+{% extends "base.html" %}
+
+{% block title %}반려동물 관리 - MyPet's Voice{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mypage.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="pets-management-container">
+    <div class="pets-header">
+        <div class="breadcrumb">
+            <a href="{{ url_for('mypage.index') }}">마이페이지</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>반려동물 관리</span>
+        </div>
+        <h2>반려동물 관리</h2>
+        <p>소중한 반려동물들의 정보를 체계적으로 관리하세요</p>
+    </div>
+
+    <div class="pets-actions">
+        <button class="btn btn-primary" onclick="addNewPet()">
+            <i class="fas fa-plus"></i> 새 반려동물 추가
+        </button>
+    </div>
+
+    <div class="pets-grid">
+        <!-- 기존 반려동물 카드 -->
+        <div class="pet-card-detailed">
+            <div class="pet-image-section">
+                <div class="pet-image">
+                    <img src="https://via.placeholder.com/200x200/ff6b6b/ffffff?text=🐕" alt="멍멍이">
+                </div>
+                <div class="pet-status-badge healthy">
+                    <i class="fas fa-heart"></i>
+                    건강
+                </div>
+            </div>
+            
+            <div class="pet-info-section">
+                <div class="pet-header">
+                    <h3>멍멍이</h3>
+                    <div class="pet-actions">
+                        <button class="action-btn" onclick="editPet(1)" title="편집">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" onclick="viewPetDetail(1)" title="상세보기">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn danger" onclick="deletePet(1)" title="삭제">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="pet-basic-info">
+                    <div class="info-row">
+                        <span class="info-label">품종</span>
+                        <span class="info-value">골든 리트리버</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">나이</span>
+                        <span class="info-value">3세 (2022년생)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">성별</span>
+                        <span class="info-value">수컷 (중성화 완료)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">체중</span>
+                        <span class="info-value">25.2kg</span>
+                    </div>
+                </div>
+
+                <div class="pet-health-summary">
+                    <h4>건강 요약</h4>
+                    <div class="health-items">
+                        <div class="health-item">
+                            <i class="fas fa-syringe"></i>
+                            <span>예방접종 완료</span>
+                        </div>
+                        <div class="health-item">
+                            <i class="fas fa-cut"></i>
+                            <span>중성화 완료</span>
+                        </div>
+                        <div class="health-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>건강검진 2024.12.15</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pet-tags">
+                    <span class="pet-tag">활발함</span>
+                    <span class="pet-tag">사람 좋아함</span>
+                    <span class="pet-tag">공놀이</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pet-card-detailed">
+            <div class="pet-image-section">
+                <div class="pet-image">
+                    <img src="https://via.placeholder.com/200x200/9b59b6/ffffff?text=🐱" alt="야옹이">
+                </div>
+                <div class="pet-status-badge healthy">
+                    <i class="fas fa-heart"></i>
+                    건강
+                </div>
+            </div>
+            
+            <div class="pet-info-section">
+                <div class="pet-header">
+                    <h3>야옹이</h3>
+                    <div class="pet-actions">
+                        <button class="action-btn" onclick="editPet(2)" title="편집">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" onclick="viewPetDetail(2)" title="상세보기">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn danger" onclick="deletePet(2)" title="삭제">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="pet-basic-info">
+                    <div class="info-row">
+                        <span class="info-label">품종</span>
+                        <span class="info-value">러시안 블루</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">나이</span>
+                        <span class="info-value">2세 (2023년생)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">성별</span>
+                        <span class="info-value">암컷 (중성화 완료)</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">체중</span>
+                        <span class="info-value">4.1kg</span>
+                    </div>
+                </div>
+
+                <div class="pet-health-summary">
+                    <h4>건강 요약</h4>
+                    <div class="health-items">
+                        <div class="health-item">
+                            <i class="fas fa-syringe"></i>
+                            <span>예방접종 완료</span>
+                        </div>
+                        <div class="health-item">
+                            <i class="fas fa-cut"></i>
+                            <span>중성화 완료</span>
+                        </div>
+                        <div class="health-item warning">
+                            <i class="fas fa-calendar-times"></i>
+                            <span>건강검진 예정</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pet-tags">
+                    <span class="pet-tag">조용함</span>
+                    <span class="pet-tag">독립적</span>
+                    <span class="pet-tag">장난감 좋아함</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 새 반려동물 추가 카드 -->
+        <div class="pet-card-add" onclick="addNewPet()">
+            <div class="add-content">
+                <div class="add-icon">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <h3>새 반려동물 추가</h3>
+                <p>소중한 반려동물을 등록해보세요</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 통계 섹션 -->
+    <div class="pets-statistics">
+        <h3>반려동물 통계</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-paw"></i>
+                </div>
+                <div class="stat-content">
+                    <h4>총 반려동물</h4>
+                    <div class="stat-number">2마리</div>
+                    <div class="stat-detail">강아지 1마리, 고양이 1마리</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-birthday-cake"></i>
+                </div>
+                <div class="stat-content">
+                    <h4>평균 나이</h4>
+                    <div class="stat-number">2.5세</div>
+                    <div class="stat-detail">건강한 젊은 반려동물들</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <div class="stat-content">
+                    <h4>건강 상태</h4>
+                    <div class="stat-number">100%</div>
+                    <div class="stat-detail">모든 반려동물이 건강</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-content">
+                    <h4>예정된 일정</h4>
+                    <div class="stat-number">3개</div>
+                    <div class="stat-detail">예방접종, 건강검진 등</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 반려동물 추가/편집 모달 -->
+<div class="modal large" id="pet-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="pet-modal-title">새 반려동물 추가</h3>
+            <button class="modal-close" onclick="closePetModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="pet-form">
+                <div class="form-section">
+                    <h4>기본 정보</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>이름 *</label>
+                            <input type="text" name="name" required placeholder="반려동물 이름">
+                        </div>
+                        <div class="form-group">
+                            <label>종류 *</label>
+                            <select name="species" required onchange="updateBreedOptions()">
+                                <option value="">선택하세요</option>
+                                <option value="dog">강아지</option>
+                                <option value="cat">고양이</option>
+                                <option value="rabbit">토끼</option>
+                                <option value="bird">새</option>
+                                <option value="hamster">햄스터</option>
+                                <option value="etc">기타</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>품종</label>
+                            <select name="breed" id="breed-select">
+                                <option value="">종류를 먼저 선택하세요</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>성별</label>
+                            <select name="gender">
+                                <option value="">선택하세요</option>
+                                <option value="male">수컷</option>
+                                <option value="female">암컷</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>생년월일</label>
+                            <input type="date" name="birth_date">
+                        </div>
+                        <div class="form-group">
+                            <label>입양일</label>
+                            <input type="date" name="adoption_date">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>체중 (kg)</label>
+                            <input type="number" name="weight" step="0.1" placeholder="0.0">
+                        </div>
+                        <div class="form-group">
+                            <label>마이크로칩 번호</label>
+                            <input type="text" name="microchip" placeholder="마이크로칩 번호">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>건강 정보</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="neutered">
+                                <span class="checkmark"></span>
+                                중성화 완료
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label>중성화 날짜</label>
+                            <input type="date" name="neuter_date">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>알레르기</label>
+                        <textarea name="allergies" placeholder="알레르기가 있다면 기록해주세요" rows="2"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>특이사항</label>
+                        <textarea name="special_notes" placeholder="건강상 특이사항이나 주의할 점" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>성격 및 특성</h4>
+                    <div class="form-group">
+                        <label>성격 태그</label>
+                        <div class="personality-tags">
+                            <label class="tag-item">
+                                <input type="checkbox" name="personality" value="friendly">
+                                <span>친화적</span>
+                            </label>
+                            <label class="tag-item">
+                                <input type="checkbox" name="personality" value="active">
+                                <span>활발함</span>
+                            </label>
+                            <label class="tag-item">
+                                <input type="checkbox" name="personality" value="calm">
+                                <span>차분함</span>
+                            </label>
+                            <label class="tag-item">
+                                <input type="checkbox" name="personality" value="playful">
+                                <span>장난기 많음</span>
+                            </label>
+                            <label class="tag-item">
+                                <input type="checkbox" name="personality" value="independent">
+                                <span>독립적</span>
+                            </label>
+                            <label class="tag-item">
+                                <input type="checkbox" name="personality" value="affectionate">
+                                <span>애교 많음</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>좋아하는 것</label>
+                        <input type="text" name="likes" placeholder="예: 공놀이, 산책, 간식">
+                    </div>
+
+                    <div class="form-group">
+                        <label>싫어하는 것</label>
+                        <input type="text" name="dislikes" placeholder="예: 목욕, 큰 소리, 다른 동물">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>사진 업로드</h4>
+                    <div class="image-upload-section">
+                        <input type="file" id="pet-images" name="images" multiple accept="image/*" style="display: none;">
+                        <div class="upload-area" onclick="document.getElementById('pet-images').click()">
+                            <i class="fas fa-camera"></i>
+                            <p>반려동물 사진을 업로드하세요</p>
+                            <small>최대 5장까지 업로드 가능</small>
+                        </div>
+                        <div class="image-preview-grid" id="image-preview-grid"></div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closePetModal()">
+                        취소
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 저장하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/mypage.js') }}"></script>
+<script>
+// 품종 옵션 데이터
+const breedOptions = {
+    dog: ['골든 리트리버', '래브라도 리트리버', '시바이누', '포메라니안', '치와와', '불독', '허스키', '말티즈', '요크셔 테리어', '보더 콜리', '기타'],
+    cat: ['러시안 블루', '페르시안', '메인쿤', '샴', '아비시니안', '브리티시 숏헤어', '노르웨이 숲', '랙돌', '스코티시 폴드', '기타'],
+    rabbit: ['네덜란드 드워프', '홀랜드 롭', '라이언헤드', '미니 롭', '기타'],
+    bird: ['앵무새', '카나리아', '십자매', '기타'],
+    hamster: ['골든 햄스터', '드워프 햄스터', '기타'],
+    etc: ['기타']
+};
+
+// 새 반려동물 추가
+function addNewPet() {
+    document.getElementById('pet-modal-title').textContent = '새 반려동물 추가';
+    document.getElementById('pet-form').reset();
+    document.getElementById('pet-modal').classList.add('active');
+}
+
+// 반려동물 편집
+function editPet(petId) {
+    document.getElementById('pet-modal-title').textContent = '반려동물 정보 수정';
+    // TODO: 기존 데이터 로드
+    document.getElementById('pet-modal').classList.add('active');
+}
+
+// 반려동물 상세보기
+function viewPetDetail(petId) {
+    // TODO: 상세보기 페이지로 이동 또는 모달 표시
+    alert(`반려동물 ${petId} 상세보기`);
+}
+
+// 반려동물 삭제
+function deletePet(petId) {
+    if (confirm('정말로 이 반려동물 정보를 삭제하시겠습니까?\n삭제된 정보는 복구할 수 없습니다.')) {
+        // TODO: 실제 삭제 API 호출
+        alert(`반려동물 ${petId} 삭제됨`);
+    }
+}
+
+// 모달 닫기
+function closePetModal() {
+    document.getElementById('pet-modal').classList.remove('active');
+    document.getElementById('pet-form').reset();
+    document.getElementById('image-preview-grid').innerHTML = '';
+}
+
+// 품종 옵션 업데이트
+function updateBreedOptions() {
+    const speciesSelect = document.querySelector('select[name="species"]');
+    const breedSelect = document.getElementById('breed-select');
+    const species = speciesSelect.value;
+    
+    breedSelect.innerHTML = '<option value="">품종 선택</option>';
+    
+    if (species && breedOptions[species]) {
+        breedOptions[species].forEach(breed => {
+            const option = document.createElement('option');
+            option.value = breed;
+            option.textContent = breed;
+            breedSelect.appendChild(option);
+        });
+    }
+}
+
+// 이미지 업로드 처리
+document.getElementById('pet-images').addEventListener('change', function(e) {
+    const files = e.target.files;
+    const previewGrid = document.getElementById('image-preview-grid');
+    previewGrid.innerHTML = '';
+    
+    for (let i = 0; i < Math.min(files.length, 5); i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const imageItem = document.createElement('div');
+            imageItem.className = 'image-preview-item';
+            imageItem.innerHTML = `
+                <img src="${e.target.result}" alt="미리보기">
+                <button type="button" class="remove-image" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            previewGrid.appendChild(imageItem);
+        };
+        
+        reader.readAsDataURL(file);
+    }
+});
+
+// 폼 제출 처리
+document.getElementById('pet-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    try {
+        // TODO: 실제 API 호출
+        alert('반려동물 정보가 저장되었습니다!');
+        closePetModal();
+        // 페이지 새로고침 또는 동적 업데이트
+        location.reload();
+    } catch (error) {
+        alert('반려동물 정보 저장 중 오류가 발생했습니다.');
+    }
+});
+
+// 모달 외부 클릭 시 닫기
+document.getElementById('pet-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closePetModal();
+    }
+});
+
+// ESC 키로 모달 닫기
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closePetModal();
+    }
+});
+</script>
+{% endblock %}

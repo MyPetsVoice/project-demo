@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+
+{% block title %}데일리케어 - MyPet's Voice{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dailycare.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dailycare-container">
+    <div class="dailycare-header">
+        <h2>데일리케어</h2>
+        <p>반려동물의 건강한 일상을 관리해보세요</p>
+    </div>
+
+    <!-- 빠른 메뉴 -->
+    <div class="quick-menu">
+        <a href="{{ url_for('dailycare.health') }}" class="quick-menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <h3>건강관리</h3>
+            <p>건강 상태 체크 및 기록</p>
+        </a>
+        
+        <a href="{{ url_for('dailycare.routine') }}" class="quick-menu-item">
+            <div class="menu-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h3>일과관리</h3>
+            <p>식사, 산책, 놀이 스케줄</p>
+        </a>
+        
+        <div class="quick-menu-item" onclick="showRecordModal()">
+            <div class="menu-icon">
+                <i class="fas fa-plus-circle"></i>
+            </div>
+            <h3>빠른 기록</h3>
+            <p>간편하게 케어 기록하기</p>
+        </div>
+    </div>
+
+    <!-- 오늘의 요약 -->
+    <div class="today-summary">
+        <h3>오늘의 케어 현황</h3>
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="card-icon feeding">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="card-content">
+                    <h4>식사</h4>
+                    <div class="progress-info">
+                        <span class="current">2</span>
+                        <span class="total">/ 3회</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 67%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="card-icon walk">
+                    <i class="fas fa-walking"></i>
+                </div>
+                <div class="card-content">
+                    <h4>산책</h4>
+                    <div class="progress-info">
+                        <span class="current">1</span>
+                        <span class="total">/ 2회</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 50%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="card-icon medicine">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div class="card-content">
+                    <h4>약/영양제</h4>
+                    <div class="progress-info">
+                        <span class="current">1</span>
+                        <span class="total">/ 1회</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="card-icon play">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <div class="card-content">
+                    <h4>놀이</h4>
+                    <div class="progress-info">
+                        <span class="current">30분</span>
+                        <span class="total">/ 60분</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 50%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 최근 활동 -->
+    <div class="recent-activities">
+        <div class="section-header">
+            <h3>최근 활동</h3>
+            <button class="btn btn-outline btn-sm" onclick="showAllActivities()">
+                전체보기
+            </button>
+        </div>
+        
+        <div class="activity-timeline">
+            <div class="activity-item">
+                <div class="activity-time">14:30</div>
+                <div class="activity-icon feeding">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>점심 식사</h4>
+                    <p>멍멍이가 사료 150g을 완식했어요</p>
+                    <span class="activity-pet">🐕 멍멍이</span>
+                </div>
+            </div>
+
+            <div class="activity-item">
+                <div class="activity-time">12:00</div>
+                <div class="activity-icon walk">
+                    <i class="fas fa-walking"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>오후 산책</h4>
+                    <p>한강공원에서 30분간 산책했어요</p>
+                    <span class="activity-pet">🐕 멍멍이</span>
+                </div>
+            </div>
+
+            <div class="activity-item">
+                <div class="activity-time">10:30</div>
+                <div class="activity-icon medicine">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>영양제 급여</h4>
+                    <p>관절 영양제 1정을 급여했어요</p>
+                    <span class="activity-pet">🐕 멍멍이</span>
+                </div>
+            </div>
+
+            <div class="activity-item">
+                <div class="activity-time">08:00</div>
+                <div class="activity-icon feeding">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>아침 식사</h4>
+                    <p>사료 150g + 간식 조금</p>
+                    <span class="activity-pet">🐕 멍멍이</span>
+                </div>
+            </div>
+
+            <div class="activity-item">
+                <div class="activity-time">07:30</div>
+                <div class="activity-icon walk">
+                    <i class="fas fa-walking"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>아침 산책</h4>
+                    <p>집 주변을 15분간 가볍게 산책</p>
+                    <span class="activity-pet">🐕 멍멍이</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 일주일 통계 -->
+    <div class="weekly-stats">
+        <h3>이번 주 통계</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h4>총 산책 시간</h4>
+                    <i class="fas fa-walking"></i>
+                </div>
+                <div class="stat-value">7시간 30분</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    전주 대비 +15%
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h4>식사 완료율</h4>
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="stat-value">95%</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    전주 대비 +5%
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h4>놀이 시간</h4>
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <div class="stat-value">5시간 20분</div>
+                <div class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i>
+                    전주 대비 -8%
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h4>체중 변화</h4>
+                    <i class="fas fa-weight"></i>
+                </div>
+                <div class="stat-value">+0.2kg</div>
+                <div class="stat-change neutral">
+                    <i class="fas fa-minus"></i>
+                    정상 범위
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 알림 및 리마인더 -->
+    <div class="reminders-section">
+        <h3>알림 및 리마인더</h3>
+        <div class="reminder-list">
+            <div class="reminder-item urgent">
+                <div class="reminder-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="reminder-content">
+                    <h4>예방접종 알림</h4>
+                    <p>멍멍이의 광견병 백신 접종일이 3일 후입니다</p>
+                    <span class="reminder-date">2025.01.13</span>
+                </div>
+                <button class="reminder-action">
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+
+            <div class="reminder-item">
+                <div class="reminder-icon">
+                    <i class="fas fa-cut"></i>
+                </div>
+                <div class="reminder-content">
+                    <h4>미용 예약</h4>
+                    <p>멍멍이 목욕 및 미용이 예정되어 있어요</p>
+                    <span class="reminder-date">2025.01.15</span>
+                </div>
+                <button class="reminder-action">
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+
+            <div class="reminder-item">
+                <div class="reminder-icon">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div class="reminder-content">
+                    <h4>구충제 급여</h4>
+                    <p>월례 구충제 급여일입니다</p>
+                    <span class="reminder-date">오늘</span>
+                </div>
+                <button class="reminder-action">
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 빠른 기록 모달 -->
+<div class="modal" id="quick-record-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>빠른 기록</h3>
+            <button class="modal-close" onclick="closeRecordModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="quick-record-form">
+                <div class="form-group">
+                    <label>반려동물</label>
+                    <select name="pet_id" required>
+                        <option value="">선택하세요</option>
+                        <option value="1">멍멍이</option>
+                        <option value="2">야옹이</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>활동 유형</label>
+                    <div class="activity-buttons">
+                        <button type="button" class="activity-btn" data-type="feeding">
+                            <i class="fas fa-utensils"></i>
+                            식사
+                        </button>
+                        <button type="button" class="activity-btn" data-type="walk">
+                            <i class="fas fa-walking"></i>
+                            산책
+                        </button>
+                        <button type="button" class="activity-btn" data-type="play">
+                            <i class="fas fa-gamepad"></i>
+                            놀이
+                        </button>
+                        <button type="button" class="activity-btn" data-type="medicine">
+                            <i class="fas fa-pills"></i>
+                            약/영양제
+                        </button>
+                        <button type="button" class="activity-btn" data-type="grooming">
+                            <i class="fas fa-cut"></i>
+                            미용
+                        </button>
+                        <button type="button" class="activity-btn" data-type="health">
+                            <i class="fas fa-heartbeat"></i>
+                            건강체크
+                        </button>
+                    </div>
+                    <input type="hidden" name="activity_type" required>
+                </div>
+
+                <div class="form-group">
+                    <label>메모</label>
+                    <textarea name="memo" placeholder="간단한 메모를 남겨주세요" rows="3"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeRecordModal()">
+                        취소
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        기록하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dailycare.js') }}"></script>
+<script>
+// 빠른 기록 모달
+function showRecordModal() {
+    document.getElementById('quick-record-modal').classList.add('active');
+}
+
+function closeRecordModal() {
+    document.getElementById('quick-record-modal').classList.remove('active');
+    document.getElementById('quick-record-form').reset();
+    // 활동 버튼 선택 해제
+    document.querySelectorAll('.activity-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+}
+
+// 활동 유형 선택
+document.querySelectorAll('.activity-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        // 다른 버튼 비활성화
+        document.querySelectorAll('.activity-btn').forEach(b => b.classList.remove('active'));
+        // 현재 버튼 활성화
+        this.classList.add('active');
+        // 숨겨진 input에 값 설정
+        document.querySelector('input[name="activity_type"]').value = this.dataset.type;
+    });
+});
+
+// 빠른 기록 폼 제출
+document.getElementById('quick-record-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('{{ url_for("dailycare.log_care") }}', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('케어 기록이 저장되었습니다!');
+            closeRecordModal();
+            // 페이지 새로고침 또는 동적 업데이트
+            location.reload();
+        } else {
+            alert('기록 저장 중 오류가 발생했습니다.');
+        }
+    } catch (error) {
+        alert('기록 저장 중 오류가 발생했습니다.');
+    }
+});
+
+// 리마인더 완료 처리
+document.querySelectorAll('.reminder-action').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const reminderItem = this.closest('.reminder-item');
+        reminderItem.style.opacity = '0.5';
+        this.innerHTML = '<i class="fas fa-check"></i> 완료';
+        this.disabled = true;
+        // TODO: 실제 완료 처리 API 호출
+    });
+});
+
+// 전체 활동 보기
+function showAllActivities() {
+    // TODO: 전체 활동 페이지로 이동 또는 모달 표시
+    alert('전체 활동 내역을 표시합니다.');
+}
+
+// 모달 외부 클릭 시 닫기
+document.getElementById('quick-record-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeRecordModal();
+    }
+});
+
+// ESC 키로 모달 닫기
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeRecordModal();
+    }
+});
+</script>
+{% endblock %}

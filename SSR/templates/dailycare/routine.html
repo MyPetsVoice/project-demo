@@ -1,0 +1,659 @@
+{% extends "base.html" %}
+
+{% block title %}일과관리 - 데일리케어{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dailycare.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="routine-container">
+    <div class="routine-header">
+        <div class="breadcrumb">
+            <a href="{{ url_for('dailycare.index') }}">데일리케어</a>
+            <i class="fas fa-chevron-right"></i>
+            <span>일과관리</span>
+        </div>
+        <h2>일과관리</h2>
+        <p>반려동물의 일상 루틴을 체계적으로 관리하세요</p>
+    </div>
+
+    <!-- 반려동물 선택 -->
+    <div class="pet-selector">
+        <div class="pet-tabs">
+            <button class="pet-tab active" data-pet="1">
+                <div class="pet-avatar">🐕</div>
+                <span>멍멍이</span>
+            </button>
+            <button class="pet-tab" data-pet="2">
+                <div class="pet-avatar">🐱</div>
+                <span>야옹이</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 오늘의 일정 -->
+    <div class="today-schedule">
+        <div class="schedule-header">
+            <h3>오늘의 일정</h3>
+            <div class="date-info">
+                <span id="current-date">2025년 1월 10일 목요일</span>
+            </div>
+        </div>
+        
+        <div class="timeline">
+            <div class="timeline-item completed">
+                <div class="timeline-time">07:00</div>
+                <div class="timeline-icon feeding">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>아침 식사</h4>
+                    <p>사료 150g + 물</p>
+                    <span class="status-badge completed">완료</span>
+                </div>
+                <div class="timeline-actions">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="timeline-item completed">
+                <div class="timeline-time">07:30</div>
+                <div class="timeline-icon walk">
+                    <i class="fas fa-walking"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>아침 산책</h4>
+                    <p>집 주변 15분 산책</p>
+                    <span class="status-badge completed">완료</span>
+                </div>
+                <div class="timeline-actions">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="timeline-item current">
+                <div class="timeline-time">12:00</div>
+                <div class="timeline-icon feeding">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>점심 식사</h4>
+                    <p>사료 150g + 간식</p>
+                    <span class="status-badge current">진행중</span>
+                </div>
+                <div class="timeline-actions">
+                    <button class="btn btn-primary btn-sm" onclick="markComplete(this)">
+                        <i class="fas fa-check"></i> 완료
+                    </button>
+                </div>
+            </div>
+
+            <div class="timeline-item pending">
+                <div class="timeline-time">14:00</div>
+                <div class="timeline-icon play">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>놀이 시간</h4>
+                    <p>공놀이 30분</p>
+                    <span class="status-badge pending">예정</span>
+                </div>
+                <div class="timeline-actions">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-clock"></i> 알림설정
+                    </button>
+                </div>
+            </div>
+
+            <div class="timeline-item pending">
+                <div class="timeline-time">18:00</div>
+                <div class="timeline-icon feeding">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>저녁 식사</h4>
+                    <p>사료 150g + 물</p>
+                    <span class="status-badge pending">예정</span>
+                </div>
+                <div class="timeline-actions">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-clock"></i> 알림설정
+                    </button>
+                </div>
+            </div>
+
+            <div class="timeline-item pending">
+                <div class="timeline-time">19:00</div>
+                <div class="timeline-icon walk">
+                    <i class="fas fa-walking"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>저녁 산책</h4>
+                    <p>한강공원 30분 산책</p>
+                    <span class="status-badge pending">예정</span>
+                </div>
+                <div class="timeline-actions">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-clock"></i> 알림설정
+                    </button>
+                </div>
+            </div>
+
+            <div class="timeline-item pending">
+                <div class="timeline-time">21:00</div>
+                <div class="timeline-icon medicine">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>영양제 급여</h4>
+                    <p>관절 영양제 1정</p>
+                    <span class="status-badge pending">예정</span>
+                </div>
+                <div class="timeline-actions">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-clock"></i> 알림설정
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 루틴 관리 -->
+    <div class="routine-management">
+        <div class="section-header">
+            <h3>루틴 관리</h3>
+            <button class="btn btn-primary" onclick="createRoutine()">
+                <i class="fas fa-plus"></i> 새 루틴 만들기
+            </button>
+        </div>
+
+        <div class="routine-tabs">
+            <button class="routine-tab active" data-type="feeding">
+                <i class="fas fa-utensils"></i>
+                식사
+            </button>
+            <button class="routine-tab" data-type="walk">
+                <i class="fas fa-walking"></i>
+                산책
+            </button>
+            <button class="routine-tab" data-type="play">
+                <i class="fas fa-gamepad"></i>
+                놀이
+            </button>
+            <button class="routine-tab" data-type="medicine">
+                <i class="fas fa-pills"></i>
+                약/영양제
+            </button>
+            <button class="routine-tab" data-type="grooming">
+                <i class="fas fa-cut"></i>
+                미용
+            </button>
+        </div>
+
+        <div class="routine-content">
+            <div class="routine-list active" data-type="feeding">
+                <div class="routine-item">
+                    <div class="routine-info">
+                        <h4>아침 식사</h4>
+                        <p>매일 오전 7시</p>
+                        <div class="routine-details">
+                            <span>사료 150g</span>
+                            <span>물 충분히</span>
+                        </div>
+                    </div>
+                    <div class="routine-status">
+                        <div class="status-indicator active"></div>
+                        <span>활성화</span>
+                    </div>
+                    <div class="routine-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editRoutine(1)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="toggleRoutine(1)">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="routine-item">
+                    <div class="routine-info">
+                        <h4>점심 식사</h4>
+                        <p>매일 오후 12시</p>
+                        <div class="routine-details">
+                            <span>사료 150g</span>
+                            <span>간식 조금</span>
+                        </div>
+                    </div>
+                    <div class="routine-status">
+                        <div class="status-indicator active"></div>
+                        <span>활성화</span>
+                    </div>
+                    <div class="routine-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editRoutine(2)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="toggleRoutine(2)">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="routine-item">
+                    <div class="routine-info">
+                        <h4>저녁 식사</h4>
+                        <p>매일 오후 6시</p>
+                        <div class="routine-details">
+                            <span>사료 150g</span>
+                            <span>물 충분히</span>
+                        </div>
+                    </div>
+                    <div class="routine-status">
+                        <div class="status-indicator active"></div>
+                        <span>활성화</span>
+                    </div>
+                    <div class="routine-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editRoutine(3)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="toggleRoutine(3)">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="routine-list" data-type="walk">
+                <div class="routine-item">
+                    <div class="routine-info">
+                        <h4>아침 산책</h4>
+                        <p>매일 오전 7시 30분</p>
+                        <div class="routine-details">
+                            <span>집 주변</span>
+                            <span>15분</span>
+                        </div>
+                    </div>
+                    <div class="routine-status">
+                        <div class="status-indicator active"></div>
+                        <span>활성화</span>
+                    </div>
+                    <div class="routine-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editRoutine(4)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="toggleRoutine(4)">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="routine-item">
+                    <div class="routine-info">
+                        <h4>저녁 산책</h4>
+                        <p>매일 오후 7시</p>
+                        <div class="routine-details">
+                            <span>한강공원</span>
+                            <span>30분</span>
+                        </div>
+                    </div>
+                    <div class="routine-status">
+                        <div class="status-indicator active"></div>
+                        <span>활성화</span>
+                    </div>
+                    <div class="routine-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editRoutine(5)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="toggleRoutine(5)">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="routine-list" data-type="play">
+                <div class="routine-item">
+                    <div class="routine-info">
+                        <h4>오후 놀이</h4>
+                        <p>매일 오후 2시</p>
+                        <div class="routine-details">
+                            <span>공놀이</span>
+                            <span>30분</span>
+                        </div>
+                    </div>
+                    <div class="routine-status">
+                        <div class="status-indicator active"></div>
+                        <span>활성화</span>
+                    </div>
+                    <div class="routine-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editRoutine(6)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="toggleRoutine(6)">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="routine-list" data-type="medicine">
+                <div class="routine-item">
+                    <div class="routine-info">
+                        <h4>관절 영양제</h4>
+                        <p>매일 오후 9시</p>
+                        <div class="routine-details">
+                            <span>1정</span>
+                            <span>식후 복용</span>
+                        </div>
+                    </div>
+                    <div class="routine-status">
+                        <div class="status-indicator active"></div>
+                        <span>활성화</span>
+                    </div>
+                    <div class="routine-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editRoutine(7)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="toggleRoutine(7)">
+                            <i class="fas fa-power-off"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="routine-list" data-type="grooming">
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-cut"></i>
+                    </div>
+                    <h4>등록된 미용 루틴이 없어요</h4>
+                    <p>정기 미용 루틴을 추가해보세요</p>
+                    <button class="btn btn-primary" onclick="createRoutine('grooming')">
+                        미용 루틴 추가
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 주간 통계 -->
+    <div class="weekly-stats">
+        <h3>이번 주 루틴 달성률</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-icon feeding">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>식사</h4>
+                    <div class="stat-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 95%"></div>
+                        </div>
+                        <span class="progress-text">95%</span>
+                    </div>
+                    <p>20/21회 완료</p>
+                </div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-icon walk">
+                    <i class="fas fa-walking"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>산책</h4>
+                    <div class="stat-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 86%"></div>
+                        </div>
+                        <span class="progress-text">86%</span>
+                    </div>
+                    <p>12/14회 완료</p>
+                </div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-icon play">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>놀이</h4>
+                    <div class="stat-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 71%"></div>
+                        </div>
+                        <span class="progress-text">71%</span>
+                    </div>
+                    <p>5/7회 완료</p>
+                </div>
+            </div>
+
+            <div class="stat-item">
+                <div class="stat-icon medicine">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div class="stat-info">
+                    <h4>약/영양제</h4>
+                    <div class="stat-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 100%"></div>
+                        </div>
+                        <span class="progress-text">100%</span>
+                    </div>
+                    <p>7/7회 완료</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 루틴 생성/편집 모달 -->
+<div class="modal" id="routine-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="routine-modal-title">새 루틴 만들기</h3>
+            <button class="modal-close" onclick="closeRoutineModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="routine-form">
+                <div class="form-group">
+                    <label>루틴 종류</label>
+                    <select name="type" required>
+                        <option value="">선택하세요</option>
+                        <option value="feeding">식사</option>
+                        <option value="walk">산책</option>
+                        <option value="play">놀이</option>
+                        <option value="medicine">약/영양제</option>
+                        <option value="grooming">미용</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>루틴 이름</label>
+                    <input type="text" name="name" required placeholder="예: 아침 식사">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>시간</label>
+                        <input type="time" name="time" required>
+                    </div>
+                    <div class="form-group">
+                        <label>반복</label>
+                        <select name="repeat">
+                            <option value="daily">매일</option>
+                            <option value="weekdays">주중</option>
+                            <option value="weekends">주말</option>
+                            <option value="custom">사용자 지정</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>상세 설명</label>
+                    <textarea name="description" placeholder="루틴에 대한 상세 설명" rows="3"></textarea>
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" name="notification" value="1" checked>
+                        <span class="checkmark"></span>
+                        알림 설정
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeRoutineModal()">
+                        취소
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        저장하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dailycare.js') }}"></script>
+<script>
+// 현재 날짜 설정
+document.getElementById('current-date').textContent = new Date().toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long'
+});
+
+// 반려동물 탭 전환
+document.querySelectorAll('.pet-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.pet-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        const petId = this.dataset.pet;
+        loadPetRoutine(petId);
+    });
+});
+
+// 루틴 탭 전환
+document.querySelectorAll('.routine-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.routine-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        document.querySelectorAll('.routine-list').forEach(list => list.classList.remove('active'));
+        const targetType = this.dataset.type;
+        document.querySelector(`.routine-list[data-type="${targetType}"]`).classList.add('active');
+    });
+});
+
+// 일정 완료 처리
+function markComplete(button) {
+    const timelineItem = button.closest('.timeline-item');
+    timelineItem.classList.remove('current');
+    timelineItem.classList.add('completed');
+    
+    const statusBadge = timelineItem.querySelector('.status-badge');
+    statusBadge.textContent = '완료';
+    statusBadge.className = 'status-badge completed';
+    
+    button.outerHTML = '<button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button>';
+    
+    // TODO: 실제 완료 처리 API 호출
+    alert('일정이 완료되었습니다!');
+}
+
+// 루틴 모달 관리
+function createRoutine(type = '') {
+    document.getElementById('routine-modal-title').textContent = '새 루틴 만들기';
+    document.getElementById('routine-form').reset();
+    
+    if (type) {
+        document.querySelector('select[name="type"]').value = type;
+    }
+    
+    document.getElementById('routine-modal').classList.add('active');
+}
+
+function editRoutine(routineId) {
+    document.getElementById('routine-modal-title').textContent = '루틴 편집';
+    // TODO: 기존 루틴 데이터 로드
+    document.getElementById('routine-modal').classList.add('active');
+}
+
+function closeRoutineModal() {
+    document.getElementById('routine-modal').classList.remove('active');
+    document.getElementById('routine-form').reset();
+}
+
+// 루틴 활성화/비활성화
+function toggleRoutine(routineId) {
+    // TODO: 루틴 활성화/비활성화 API 호출
+    alert(`루틴 ${routineId} 상태를 변경합니다.`);
+}
+
+// 루틴 폼 제출
+document.getElementById('routine-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    try {
+        // TODO: 실제 API 호출
+        alert('루틴이 저장되었습니다!');
+        closeRoutineModal();
+        // 페이지 새로고침
+        location.reload();
+    } catch (error) {
+        alert('루틴 저장 중 오류가 발생했습니다.');
+    }
+});
+
+// 반려동물 루틴 데이터 로드
+function loadPetRoutine(petId) {
+    // TODO: 선택된 반려동물의 루틴 데이터 로드
+    console.log('로드할 반려동물 ID:', petId);
+}
+
+// 모달 외부 클릭 시 닫기
+document.getElementById('routine-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeRoutineModal();
+    }
+});
+
+// 현재 시간에 따른 타임라인 업데이트
+function updateTimeline() {
+    const now = new Date();
+    const currentTime = now.getHours() * 60 + now.getMinutes();
+    
+    document.querySelectorAll('.timeline-item').forEach(item => {
+        const timeText = item.querySelector('.timeline-time').textContent;
+        const [hours, minutes] = timeText.split(':').map(Number);
+        const itemTime = hours * 60 + minutes;
+        
+        if (itemTime <= currentTime && !item.classList.contains('completed')) {
+            item.classList.add('current');
+            item.classList.remove('pending');
+        }
+    });
+}
+
+// 페이지 로드 시 타임라인 업데이트
+document.addEventListener('DOMContentLoaded', function() {
+    updateTimeline();
+});
+
+// 5분마다 타임라인 업데이트
+setInterval(updateTimeline, 5 * 60 * 1000);
+</script>
+{% endblock %}

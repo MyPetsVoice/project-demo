@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}글 작성 - 커뮤니티{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/community.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="community-create-container">
+    <div class="community-create-header">
+        <h2>새 글 작성</h2>
+        <div class="header-actions">
+            <a href="{{ url_for('community.index') }}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> 목록으로
+            </a>
+        </div>
+    </div>
+
+    <form id="community-form" class="community-form">
+        <div class="form-section">
+            <h3>기본 정보</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="post-category">카테고리 *</label>
+                    <select id="post-category" name="category" required>
+                        <option value="">카테고리를 선택하세요</option>
+                        <option value="question">질문</option>
+                        <option value="info">정보공유</option>
+                        <option value="walk">산책해요</option>
+                        <option value="photo">사진자랑</option>
+                        <option value="free">자유게시판</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pet-type">반려동물 종류</label>
+                    <select id="pet-type" name="pet_type">
+                        <option value="">선택안함</option>
+                        <option value="dog">강아지</option>
+                        <option value="cat">고양이</option>
+                        <option value="rabbit">토끼</option>
+                        <option value="bird">새</option>
+                        <option value="etc">기타</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>글 내용</h3>
+            <div class="form-group">
+                <label for="post-title">제목 *</label>
+                <input type="text" id="post-title" name="title" required 
+                       placeholder="제목을 입력하세요">
+            </div>
+
+            <div class="form-group">
+                <label for="post-content">내용 *</label>
+                <div class="editor-toolbar">
+                    <button type="button" class="editor-btn" data-command="bold">
+                        <i class="fas fa-bold"></i>
+                    </button>
+                    <button type="button" class="editor-btn" data-command="italic">
+                        <i class="fas fa-italic"></i>
+                    </button>
+                    <button type="button" class="editor-btn" data-command="underline">
+                        <i class="fas fa-underline"></i>
+                    </button>
+                    <div class="toolbar-divider"></div>
+                    <button type="button" class="editor-btn" data-command="insertUnorderedList">
+                        <i class="fas fa-list-ul"></i>
+                    </button>
+                    <button type="button" class="editor-btn" data-command="insertOrderedList">
+                        <i class="fas fa-list-ol"></i>
+                    </button>
+                    <div class="toolbar-divider"></div>
+                    <button type="button" class="editor-btn" id="insert-link">
+                        <i class="fas fa-link"></i>
+                    </button>
+                </div>
+                <div id="post-content" class="content-editor" contenteditable="true" 
+                     placeholder="내용을 입력하세요..."></div>
+                <textarea id="post-content-hidden" name="content" style="display: none;"></textarea>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>첨부파일</h3>
+            <div class="form-group">
+                <label for="post-images">이미지 첨부</label>
+                <div class="image-upload-area" id="image-upload-area">
+                    <input type="file" id="post-images" name="images" multiple accept="image/*">
+                    <div class="upload-placeholder">
+                        <i class="fas fa-camera"></i>
+                        <p>이미지를 업로드하세요</p>
+                        <small>최대 10장까지 업로드 가능</small>
+                    </div>
+                </div>
+                <div class="image-preview" id="image-preview"></div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>게시 설정</h3>
+            <div class="form-group checkbox-group">
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="allow_comments" value="1" checked>
+                    <span class="checkmark"></span>
+                    댓글 허용
+                </label>
+            </div>
+            
+            <div class="form-group checkbox-group">
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" name="is_anonymous" value="1">
+                    <span class="checkmark"></span>
+                    익명으로 게시
+                </label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn btn-outline" onclick="history.back()">
+                취소
+            </button>
+            <button type="button" class="btn btn-secondary">
+                <i class="fas fa-save"></i> 임시저장
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane"></i> 게시하기
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/community.js') }}"></script>
+<script>
+// 에디터 기능
+document.querySelectorAll('.editor-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const command = this.dataset.command;
+        document.execCommand(command, false, null);
+        document.getElementById('post-content').focus();
+    });
+});
+
+// 링크 삽입
+document.getElementById('insert-link').addEventListener('click', function(e) {
+    e.preventDefault();
+    const url = prompt('링크 URL을 입력하세요:');
+    if (url) {
+        document.execCommand('createLink', false, url);
+    }
+});
+
+// 내용 동기화
+document.getElementById('post-content').addEventListener('input', function() {
+    document.getElementById('post-content-hidden').value = this.innerHTML;
+});
+
+// 이미지 업로드 처리
+document.getElementById('post-images').addEventListener('change', function(e) {
+    const files = e.target.files;
+    const preview = document.getElementById('image-preview');
+    preview.innerHTML = '';
+    
+    for (let i = 0; i < Math.min(files.length, 10); i++) {
+        const file = files[i];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'image-preview-item';
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="미리보기">
+                <button type="button" class="remove-image" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            preview.appendChild(div);
+        };
+        
+        reader.readAsDataURL(file);
+    }
+});
+
+// 폼 제출 처리
+document.getElementById('community-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // 내용 동기화
+    document.getElementById('post-content-hidden').value = 
+        document.getElementById('post-content').innerHTML;
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('{{ url_for("community.create") }}', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('게시글이 성공적으로 작성되었습니다!');
+            window.location.href = '{{ url_for("community.index") }}';
+        } else {
+            alert('게시글 작성 중 오류가 발생했습니다.');
+        }
+    } catch (error) {
+        alert('게시글 작성 중 오류가 발생했습니다.');
+    }
+});
+
+// 임시저장 기능
+document.querySelector('.btn-secondary').addEventListener('click', function() {
+    const title = document.getElementById('post-title').value;
+    const content = document.getElementById('post-content').innerHTML;
+    const category = document.getElementById('post-category').value;
+    
+    const draftData = {
+        title,
+        content,
+        category,
+        timestamp: new Date().toISOString()
+    };
+    
+    localStorage.setItem('community_draft', JSON.stringify(draftData));
+    alert('임시저장되었습니다.');
+});
+
+// 임시저장된 데이터 복원
+window.addEventListener('load', function() {
+    const draft = localStorage.getItem('community_draft');
+    if (draft) {
+        const draftData = JSON.parse(draft);
+        if (confirm('임시저장된 글이 있습니다. 복원하시겠습니까?')) {
+            document.getElementById('post-title').value = draftData.title || '';
+            document.getElementById('post-content').innerHTML = draftData.content || '';
+            document.getElementById('post-category').value = draftData.category || '';
+        }
+    }
+});
+</script>
+{% endblock %}

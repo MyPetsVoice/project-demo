@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}일기 상세보기 - MyPet's Voice{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/diary.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="diary-detail-container">
+    <div class="diary-detail-header">
+        <div class="header-actions">
+            <a href="{{ url_for('diary.index') }}" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> 목록으로
+            </a>
+            <!-- TODO: 작성자 확인 후 표시 -->
+            <div class="author-actions">
+                <button class="btn btn-outline btn-sm">
+                    <i class="fas fa-edit"></i> 수정
+                </button>
+                <button class="btn btn-danger btn-sm">
+                    <i class="fas fa-trash"></i> 삭제
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <article class="diary-detail">
+        <header class="diary-detail-info">
+            <div class="pet-info">
+                <div class="pet-avatar">🐕</div>
+                <div class="pet-details">
+                    <h3>멍멍이의 일기</h3>
+                    <div class="diary-meta">
+                        <span class="date">2025년 1월 10일</span>
+                        <span class="weather">☀️ 맑음 15°C</span>
+                        <span class="mood">😊 행복해요</span>
+                    </div>
+                </div>
+            </div>
+            <div class="diary-stats">
+                <button class="stat-btn like-btn">
+                    <i class="fas fa-heart"></i>
+                    <span>15</span>
+                </button>
+                <span class="stat-item">
+                    <i class="fas fa-eye"></i>
+                    <span>32</span>
+                </span>
+            </div>
+        </header>
+
+        <div class="diary-content">
+            <h1 class="diary-title">오늘 산책이 너무 즐거웠어!</h1>
+            
+            <div class="diary-images">
+                <!-- TODO: 실제 이미지 데이터로 대체 -->
+                <div class="image-gallery">
+                    <div class="image-item">
+                        <img src="https://via.placeholder.com/400x300/ff6b6b/ffffff?text=🐕" alt="산책 사진">
+                    </div>
+                    <div class="image-item">
+                        <img src="https://via.placeholder.com/400x300/4ecdc4/ffffff?text=🏞️" alt="공원 사진">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="diary-text">
+                <p>안녕! 멍멍이야~ 🐕</p>
+                
+                <p>오늘 한강공원 산책이 정말 최고였어! 주인님과 함께 넓은 잔디밭을 뛰어다니는 게 너무 행복했어.</p>
+                
+                <p>새로운 친구들도 많이 만났어! 특히 같은 골든 리트리버 친구랑 공놀이를 했는데, 정말 신났어~ 🎾</p>
+                
+                <p>주인님이 나를 위해 시간을 내주셔서 고마워! 내일은 또 어떤 재미있는 일이 있을까? 💕</p>
+                
+                <p>오늘 먹은 간식도 너무 맛있었고, 집에 돌아와서 편안하게 쉬고 있어. 하루가 이렇게 행복할 수가 있나?</p>
+            </div>
+        </div>
+
+        <footer class="diary-detail-footer">
+            <div class="author-info">
+                <div class="author-avatar">
+                    <img src="https://via.placeholder.com/40x40/666/ffffff?text=U" alt="작성자">
+                </div>
+                <div class="author-details">
+                    <span class="author-name">반려동물러버</span>
+                    <span class="created-date">2025년 1월 10일 작성</span>
+                </div>
+            </div>
+            
+            <div class="diary-actions">
+                <button class="action-btn share-btn">
+                    <i class="fas fa-share"></i>
+                    공유하기
+                </button>
+                <button class="action-btn report-btn">
+                    <i class="fas fa-flag"></i>
+                    신고하기
+                </button>
+            </div>
+        </footer>
+    </article>
+
+    <!-- 댓글 섹션 -->
+    <section class="comments-section">
+        <h3>댓글 <span class="comment-count">3</span></h3>
+        
+        <div class="comment-form">
+            <div class="comment-input-wrapper">
+                <textarea placeholder="따뜻한 댓글을 남겨주세요..." rows="3"></textarea>
+                <button class="btn btn-primary">댓글 작성</button>
+            </div>
+        </div>
+
+        <div class="comments-list">
+            <div class="comment-item">
+                <div class="comment-avatar">
+                    <img src="https://via.placeholder.com/36x36/ff6b6b/ffffff?text=U1" alt="댓글 작성자">
+                </div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-author">고양이집사</span>
+                        <span class="comment-date">1시간 전</span>
+                    </div>
+                    <p class="comment-text">우와! 멍멍이가 정말 행복해 보여요~ 우리 야옹이도 한강공원 좋아하는데 언젠가 만날 수 있으면 좋겠어요! 😸</p>
+                    <div class="comment-actions">
+                        <button class="comment-like">❤️ 2</button>
+                        <button class="comment-reply">답글</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comment-item">
+                <div class="comment-avatar">
+                    <img src="https://via.placeholder.com/36x36/4ecdc4/ffffff?text=U2" alt="댓글 작성자">
+                </div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-author">강아지아빠</span>
+                        <span class="comment-date">2시간 전</span>
+                    </div>
+                    <p class="comment-text">산책하는 모습이 너무 사랑스러워요! 골든 리트리버 정말 활발하죠~ 우리 아이도 공놀이 좋아해요!</p>
+                    <div class="comment-actions">
+                        <button class="comment-like">❤️ 5</button>
+                        <button class="comment-reply">답글</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comment-item">
+                <div class="comment-avatar">
+                    <img src="https://via.placeholder.com/36x36/95a5a6/ffffff?text=U3" alt="댓글 작성자">
+                </div>
+                <div class="comment-content">
+                    <div class="comment-header">
+                        <span class="comment-author">펫러버</span>
+                        <span class="comment-date">3시간 전</span>
+                    </div>
+                    <p class="comment-text">멍멍이 일기 너무 귀여워요! 반려동물 관점에서 쓴 일기라니 정말 창의적이에요 👍</p>
+                    <div class="comment-actions">
+                        <button class="comment-like">❤️ 8</button>
+                        <button class="comment-reply">답글</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/diary.js') }}"></script>
+<script>
+// 좋아요 버튼 처리
+document.querySelector('.like-btn').addEventListener('click', function() {
+    this.classList.toggle('liked');
+    // TODO: 실제 좋아요 API 호출
+});
+
+// 공유하기 버튼 처리
+document.querySelector('.share-btn').addEventListener('click', function() {
+    if (navigator.share) {
+        navigator.share({
+            title: '멍멍이의 일기 - MyPet\'s Voice',
+            text: '오늘 산책이 너무 즐거웠어!',
+            url: window.location.href
+        });
+    } else {
+        // 폴백: 클립보드에 복사
+        navigator.clipboard.writeText(window.location.href);
+        alert('링크가 클립보드에 복사되었습니다!');
+    }
+});
+
+// 댓글 작성 처리
+document.querySelector('.comment-form button').addEventListener('click', function() {
+    const textarea = document.querySelector('.comment-form textarea');
+    const content = textarea.value.trim();
+    
+    if (!content) {
+        alert('댓글 내용을 입력해주세요.');
+        return;
+    }
+    
+    // TODO: 실제 댓글 작성 API 호출
+    alert('댓글이 작성되었습니다!');
+    textarea.value = '';
+});
+</script>
+{% endblock %}

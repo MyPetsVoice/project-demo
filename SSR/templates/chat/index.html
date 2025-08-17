@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}AI 채팅 - MyPet's Voice{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+{% endblock %}
+
+{% block content %}
+    <!-- 데모 알림 -->
+    <!-- <div class="demo-notice">
+        🔓 로그아웃 상태의 MyPet's Voice 데모 페이지입니다. 로그인하여 모든 기능을 이용해보세요!
+    </div> -->
+
+<div class="chat-container">
+    <div class="chat-header">
+        <div class="pet-selector">
+            <select id="chat-pet-select" onchange="selectChatPet()">
+                <option value="">대화할 반려동물을 선택하세요</option>
+                <option value="1">멍멍이 (개)</option>
+                <option value="2">야옹이 (고양이)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages">
+        {% if not session.user_id %}
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <div style="font-size: 48px; margin-bottom: 20px;">🔒</div>
+            <p>채팅 기능을 사용하려면 로그인이 필요합니다.</p>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-primary" style="margin-top: 20px;">
+                로그인하기
+            </a>
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 40px; color: #666;">
+            <div style="font-size: 48px; margin-bottom: 20px;">🐾</div>
+            <p>반려동물을 선택하고 대화를 시작해보세요!</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="chat-input-container">
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="메시지를 입력하세요..." 
+                   onkeypress="handleChatKeyPress(event)" 
+                   {% if not session.user_id %}disabled{% endif %}>
+            <button id="chat-send-btn" onclick="sendMessage()" 
+                    {% if not session.user_id %}disabled{% endif %}>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

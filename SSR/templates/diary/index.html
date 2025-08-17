@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}너의 일기장 - MyPet's Voice{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/diary.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="diary-container">
+    <div class="diary-header">
+        <h2>반려동물 일기</h2>
+        <div class="diary-actions">
+            <a href="{{ url_for('diary.create') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> 일기 쓰기
+            </a>
+        </div>
+    </div>
+
+    <div class="diary-filters">
+        <select id="diary-pet-filter">
+            <option value="">모든 반려동물</option>
+            <!-- TODO: 반려동물 목록 동적 로드 -->
+            <option value="1">멍멍이</option>
+            <option value="2">야옹이</option>
+        </select>
+        <div class="view-toggle">
+            <button class="view-btn active" data-view="my">내 일기</button>
+            <button class="view-btn" data-view="public">공개 일기</button>
+        </div>
+    </div>
+
+    <div class="diary-grid" id="diary-grid">
+        <!-- 샘플 일기 카드들 -->
+        <div class="diary-card">
+            <div class="diary-image">🐕</div>
+            <div class="diary-content">
+                <div class="diary-meta">
+                    <span>2025-01-10</span>
+                    <span>☀️ 맑음 15°C</span>
+                </div>
+                <div class="diary-title">오늘 산책이 너무 즐거웠어!</div>
+                <div class="diary-preview">안녕! 멍멍이야~ 🐕
+                
+오늘 한강공원 산책이 정말 최고였어! 주인님과 함께 넓은 잔디밭을 뛰어다니는 게 너무 행복했어. 
+
+새로운 친구들도 많이 만났어! 특히 같은 골든 리트리버 친구랑 공놀이를 했는데, 정말 신났어~ 🎾</div>
+                <div class="diary-footer">
+                    <div class="diary-pet">
+                        <div class="diary-pet-avatar">🐕</div>
+                        <span>멍멍이</span>
+                    </div>
+                    <div class="diary-stats">
+                        <span>❤️ 15</span>
+                        <span>👀 32</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="diary-card">
+            <div class="diary-image">🐱</div>
+            <div class="diary-content">
+                <div class="diary-meta">
+                    <span>2025-01-09</span>
+                    <span>☁️ 흐림 12°C</span>
+                </div>
+                <div class="diary-title">새 장난감이 왔어!</div>
+                <div class="diary-preview">냥~ 야옹이야 🐱
+
+오늘 집사가 나를 위해 새로운 선물을 사왔어! 깃털이 달린 막대기인데, 이걸 보니까 야생의 본능이 깨어나는 것 같아.
+
+처음에는 도도한 척 관심 없는 듯했지만... 사실 너무 신났어! 😸</div>
+                <div class="diary-footer">
+                    <div class="diary-pet">
+                        <div class="diary-pet-avatar">🐱</div>
+                        <span>야옹이</span>
+                    </div>
+                    <div class="diary-stats">
+                        <span>❤️ 22</span>
+                        <span>👀 45</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="diary-card">
+            <div class="diary-image">🐕</div>
+            <div class="diary-content">
+                <div class="diary-meta">
+                    <span>2025-01-08</span>
+                    <span>🌧️ 비 8°C</span>
+                </div>
+                <div class="diary-title">비 오는 날의 실내 놀이</div>
+                <div class="diary-preview">오늘은 비가 와서 산책을 못 갔어... 조금 심심했지만 주인님이 집에서 재미있는 놀이를 해줬어! 숨바꼭질도 하고 공놀이도 했어. 비록 밖에 나가진 못했지만 주인님과 함께 있어서 행복했어!</div>
+                <div class="diary-footer">
+                    <div class="diary-pet">
+                        <div class="diary-pet-avatar">🐕</div>
+                        <span>멍멍이</span>
+                    </div>
+                    <div class="diary-stats">
+                        <span>❤️ 8</span>
+                        <span>👀 18</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 빈 상태 -->
+    <div class="empty-state" style="display: none;">
+        <div class="empty-icon">📖</div>
+        <h3>아직 작성된 일기가 없어요</h3>
+        <p>반려동물의 첫 번째 일기를 작성해보세요!</p>
+        <a href="{{ url_for('diary.create') }}" class="btn btn-primary">
+            일기 작성하기
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/diary.js') }}"></script>
+{% endblock %}
