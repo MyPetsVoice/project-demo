@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pet.name }} 일기 작성 - PetCare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        {% if pet.profile_image %}
+                            <img src="{{ pet.profile_image }}" alt="{{ pet.name }}" class="rounded-circle" width="50" height="50">
+                        {% else %}
+                            <div class="bg-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                <i class="fas fa-paw text-success"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h4 class="mb-0">{{ pet.name }}의 일기 작성</h4>
+                        <small>오늘 있었던 특별한 일을 기록해보세요</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <form id="diaryForm">
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <label for="title" class="form-label">일기 제목 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" required 
+                                   placeholder="예: 오늘은 공원에서 신나게 놀았어요!">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="weather" class="form-label">오늘 날씨</label>
+                            <select class="form-select" id="weather" name="weather">
+                                <option value="맑음">☀️ 맑음</option>
+                                <option value="구름많음">⛅ 구름많음</option>
+                                <option value="흐림">☁️ 흐림</option>
+                                <option value="비">🌧️ 비</option>
+                                <option value="눈">❄️ 눈</option>
+                                <option value="바람">💨 바람</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="photos" class="form-label">사진 업로드</label>
+                        <input type="file" class="form-control" id="photos" name="photos" multiple accept="image/*">
+                        <div class="form-text">여러 장의 사진을 선택할 수 있어요 (최대 5장)</div>
+                        <div id="photoPreview" class="mt-3 d-none">
+                            <div class="row" id="photoContainer"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="content_summary" class="form-label">오늘 있었던 일 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="content_summary" name="content_summary" rows="6" required
+                                  placeholder="오늘 {{ pet.name }}과(와) 함께한 일들을 간단히 적어주세요. AI가 {{ pet.name }}의 관점에서 감동적인 일기로 만들어드릴게요!
+
+예:
+- 아침에 공원에 산책을 갔어요
+- 새로운 장난감을 가지고 놀았어요  
+- 친구 강아지를 만나서 함께 뛰어놀았어요
+- 맛있는 간식을 먹었어요"></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_public" name="is_public">
+                            <label class="form-check-label" for="is_public">
+                                <i class="fas fa-globe"></i> 다른 사용자들과 공유하기
+                            </label>
+                            <div class="form-text">체크하면 다른 사용자들도 이 일기를 볼 수 있어요</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('pet_diary', pet_id=pet.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> 취소
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-magic"></i> AI로 일기 생성하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 일기 미리보기 모달 -->
+<div class="modal fade" id="diaryPreviewModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fas fa-book"></i> {{ pet.name }}의 일기 미리보기</h5>
+            </div>
+            <div class="modal-body">
+                <div id="diaryPreviewContent">
+                    <!-- 생성된 일기 내용이 여기에 표시됩니다 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="regenerateDiary()">
+                    <i class="fas fa-redo"></i> 다시 생성
+                </button>
+                <button type="button" class="btn btn-warning" onclick="editDiary()">
+                    <i class="fas fa-edit"></i> 수정
+                </button>
+                <button type="button" class="btn btn-success" onclick="saveDiary()">
+                    <i class="fas fa-save"></i> 저장
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 로딩 모달 -->
+<div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center py-5">
+                <div class="loading-spinner mb-4" style="width: 50px; height: 50px; border-width: 5px;"></div>
+                <h5>{{ pet.name }}의 일기를 작성하고 있어요...</h5>
+                <p class="text-muted">AI가 {{ pet.name }}의 마음을 담아 특별한 일기를 만들고 있습니다.</p>
+                <div class="progress mt-3" style="height: 10px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                         style="width: 0%" id="progressBar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentDiaryData = null;
+
+// 사진 업로드 미리보기
+document.getElementById('photos').addEventListener('change', function(e) {
+    const files = Array.from(e.target.files);
+    const container = document.getElementById('photoContainer');
+    const preview = document.getElementById('photoPreview');
+    
+    container.innerHTML = '';
+    
+    if (files.length > 0) {
+        preview.classList.remove('d-none');
+        
+        files.slice(0, 5).forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const col = document.createElement('div');
+                col.className = 'col-md-2 col-4 mb-2';
+                col.innerHTML = `
+                    <div class="position-relative">
+                        <img src="${e.target.result}" class="img-fluid rounded" style="height: 80px; object-fit: cover; width: 100%;">
+                        <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" 
+                                onclick="removePhoto(${index})" style="width: 20px; height: 20px; font-size: 10px;">
+                            ×
+                        </button>
+                    </div>
+                `;
+                container.appendChild(col);
+            };
+            reader.readAsDataURL(file);
+        });
+    } else {
+        preview.classList.add('d-none');
+    }
+});
+
+// 일기 작성 폼 제출
+document.getElementById('diaryForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+        if (key !== 'photos') {
+            data[key] = value;
+        }
+    }
+    
+    data.is_public = document.getElementById('is_public').checked;
+    
+    // 로딩 모달 표시
+    const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+    loadingModal.show();
+    
+    // 진행률 애니메이션
+    animateProgress();
+    
+    try {
+        const response = await fetch(`/diary/write/{{ pet.id }}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        loadingModal.hide();
+        
+        if (response.ok) {
+            currentDiaryData = result;
+            showDiaryPreview(result.diary_content, data);
+        } else {
+            alert(result.error || '일기 생성 중 오류가 발생했습니다.');
+        }
+    } catch (error) {
+        loadingModal.hide();
+        alert('일기 생성 중 오류가 발생했습니다.');
+        console.error('Error:', error);
+    }
+});
+
+function animateProgress() {
+    const progressBar = document.getElementById('progressBar');
+    let width = 0;
+    const interval = setInterval(() => {
+        width += Math.random() * 15;
+        if (width >= 90) {
+            width = 90;
+            clearInterval(interval);
+        }
+        progressBar.style.width = width + '%';
+    }, 200);
+}
+
+function showDiaryPreview(content, formData) {
+    const previewContent = document.getElementById('diaryPreviewContent');
+    
+    previewContent.innerHTML = `
+        <div class="diary-preview">
+            <div class="text-center mb-4">
+                <h4>${formData.title}</h4>
+                <p class="text-muted">
+                    <i class="fas fa-calendar"></i> ${new Date().toLocaleDateString('ko-KR')} 
+                    <span class="ms-3">${formData.weather}</span>
+                </p>
+            </div>
+            
+            <div class="diary-content" style="line-height: 1.8; font-size: 1.1rem;">
+                ${content.split('\n').map(line => `<p>${line}</p>`).join('')}
+            </div>
+            
+            <div class="mt-4 text-center">
+                <small class="text-muted">
+                    <i class="fas fa-heart text-danger"></i> 
+                    {{ pet.name }}이(가) 직접 쓴 것처럼 느껴지나요?
+                </small>
+            </div>
+        </div>
+    `;
+    
+    const previewModal = new bootstrap.Modal(document.getElementById('diaryPreviewModal'));
+    previewModal.show();
+}
+
+function regenerateDiary() {
+    const previewModal = bootstrap.Modal.getInstance(document.getElementById('diaryPreviewModal'));
+    previewModal.hide();
+    
+    setTimeout(() => {
+        document.getElementById('diaryForm').dispatchEvent(new Event('submit'));
+    }, 300);
+}
+
+function editDiary() {
+    alert('일기 수정 기능은 추후 구현 예정입니다.');
+}
+
+function saveDiary() {
+    if (currentDiaryData && currentDiaryData.redirect) {
+        alert(currentDiaryData.message);
+        window.location.href = currentDiaryData.redirect;
+    }
+}
+
+function removePhoto(index) {
+    // 사진 제거 기능 (추후 구현)
+    alert('사진 제거 기능은 추후 구현 예정입니다.');
+}
+</script>
+{% endblock %}

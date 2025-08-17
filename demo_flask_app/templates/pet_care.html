@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}{{ pet.name }} 케어 관리 - PetCare{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex align-items-center">
+        <div class="flex-shrink-0 me-3">
+            {% if pet.profile_image %}
+                <img src="{{ pet.profile_image }}" alt="{{ pet.name }}" class="rounded-circle" width="60" height="60">
+            {% else %}
+                <div class="bg-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="fas fa-paw text-white fa-2x"></i>
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <h2 class="mb-0">{{ pet.name }} 케어 관리</h2>
+            <p class="text-muted mb-0">{{ pet.species }} • 건강한 일상을 위한 관리</p>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('care') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> 돌아가기
+    </a>
+</div>
+
+<div class="row">
+    <!-- 건강 기록 -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-heartbeat text-danger"></i> 건강 기록</h5>
+                <button class="btn btn-sm btn-danger" onclick="addHealthRecord()">
+                    <i class="fas fa-plus"></i> 추가
+                </button>
+            </div>
+            <div class="card-body">
+                {% if health_records %}
+                    {% for record in health_records[:5] %}
+                    <div class="border-bottom pb-2 mb-2">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{ record.title }}</h6>
+                                <p class="text-muted small mb-1">{{ record.record_type }}</p>
+                                <small class="text-muted">{{ record.record_date.strftime('%Y.%m.%d') }}</small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="viewHealthRecord({{ record.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-heartbeat fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">아직 건강 기록이 없어요</p>
+                        <button class="btn btn-danger" onclick="addHealthRecord()">첫 기록 추가하기</button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 케어 루틴 -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-tasks text-warning"></i> 케어 루틴</h5>
+                <button class="btn btn-sm btn-warning" onclick="addCareRoutine()">
+                    <i class="fas fa-plus"></i> 추가
+                </button>
+            </div>
+            <div class="card-body">
+                {% if care_routines %}
+                    {% for routine in care_routines %}
+                    <div class="routine-item p-3 mb-2 rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ routine.title }}</h6>
+                                <p class="text-muted small mb-0">{{ routine.frequency }}</p>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       {% if routine.is_completed %}checked{% endif %}
+                                       onchange="toggleRoutineComplete({{ routine.id }})">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-tasks fa-2x text-muted mb-3"></i>
+                        <p class="text-muted">아직 케어 루틴이 없어요</p>
+                        <button class="btn btn-warning" onclick="addCareRoutine()">첫 루틴 추가하기</button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 오늘의 할 일 요약 -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-calendar-day text-info"></i> 오늘의 할 일</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>완료해야 할 루틴</h6>
+                <div id="todayRoutines">
+                    <div class="text-muted">오늘 완료해야 할 루틴이 없어요! 🎉</div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6>다가오는 일정</h6>
+                <div id="upcomingEvents">
+                    <div class="text-muted">예정된 일정이 없어요.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addHealthRecord() {
+    alert('건강 기록 추가 기능은 추후 구현 예정입니다.');
+}
+
+function viewHealthRecord(recordId) {
+    alert('건강 기록 상세보기 기능은 추후 구현 예정입니다.');
+}
+
+function addCareRoutine() {
+    alert('케어 루틴 추가 기능은 추후 구현 예정입니다.');
+}
+
+function toggleRoutineComplete(routineId) {
+    // 실제로는 API를 호출해서 완료 상태를 업데이트
+    alert('루틴 완료 상태 업데이트 기능은 추후 구현 예정입니다.');
+}
+</script>
+{% endblock %}

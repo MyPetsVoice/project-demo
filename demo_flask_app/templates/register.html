@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}회원가입 - PetCare{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h2><i class="fas fa-paw text-primary"></i> 회원가입</h2>
+                    <p class="text-muted">PetCare에 오신 것을 환영합니다!</p>
+                </div>
+
+                <form id="registerForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">아이디</label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                        <div class="form-text">영문, 숫자 조합 4-20자</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">이메일</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nickname" class="form-label">닉네임</label>
+                        <input type="text" class="form-control" id="nickname" name="nickname" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">비밀번호</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <div class="form-text">영문, 숫자, 특수문자 조합 8자 이상</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="confirmPassword" class="form-label">비밀번호 확인</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">회원가입</button>
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <div class="text-center">
+                    <p class="mb-3">소셜 계정으로 간편 가입</p>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-warning" onclick="socialLogin('kakao')">
+                            <i class="fab fa-kakao"></i> 카카오로 회원가입
+                        </button>
+                        <button class="btn btn-success" onclick="socialLogin('naver')">
+                            <i class="fab fa-naver"></i> 네이버로 회원가입
+                        </button>
+                        <button class="btn btn-danger" onclick="socialLogin('google')">
+                            <i class="fab fa-google"></i> 구글로 회원가입
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <p>이미 계정이 있으신가요? <a href="{{ url_for('login') }}">로그인하기</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
+    const username = formData.get('username');
+    const email = formData.get('email');
+    const nickname = formData.get('nickname');
+    
+    console.log('Password:', password);
+    console.log('Confirm Password:', confirmPassword);
+    
+    // 필수 필드 확인
+    if (!username || !email || !nickname || !password || !confirmPassword) {
+        alert('모든 필드를 입력해주세요.');
+        return;
+    }
+    
+    // 비밀번호 확인
+    if (password !== confirmPassword) {
+        alert('비밀번호가 일치하지 않습니다.');
+        document.getElementById('confirmPassword').focus();
+        return;
+    }
+    
+    // 비밀번호 길이 확인 (간단한 검사)
+    if (password.length < 6) {
+        alert('비밀번호는 최소 6자 이상이어야 합니다.');
+        document.getElementById('password').focus();
+        return;
+    }
+    
+    // 아이디 길이 확인
+    if (username.length < 4 || username.length > 20) {
+        alert('아이디는 4-20자여야 합니다.');
+        document.getElementById('username').focus();
+        return;
+    }
+    
+    try {
+        const response = await fetch('/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: formData.get('username'),
+                email: formData.get('email'),
+                nickname: formData.get('nickname'),
+                password: password
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert(result.message);
+            window.location.href = '/login';
+        } else {
+            alert(result.error);
+        }
+    } catch (error) {
+        alert('회원가입 중 오류가 발생했습니다.');
+        console.error('Error:', error);
+    }
+});
+
+function socialLogin(provider) {
+    alert(`${provider} 소셜 로그인은 추후 구현 예정입니다.`);
+}
+</script>
+{% endblock %}

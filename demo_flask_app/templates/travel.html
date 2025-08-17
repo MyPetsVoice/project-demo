@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block title %}반려동물 여행지 - PetCare{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-suitcase-rolling text-success"></i> 반려동물 동반 여행지</h2>
+</div>
+
+<!-- 필터 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-3">
+                <select class="form-select" id="regionFilter">
+                    <option value="">전체 지역</option>
+                    <option value="서울">서울</option>
+                    <option value="경기">경기</option>
+                    <option value="강원">강원</option>
+                    <option value="제주">제주</option>
+                    <option value="부산">부산</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="typeFilter">
+                    <option value="">여행지 유형</option>
+                    <option value="펜션">🏠 펜션</option>
+                    <option value="캠핑장">🏕️ 캠핑장</option>
+                    <option value="리조트">🏖️ 리조트</option>
+                    <option value="관광지">🗻 관광지</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="searchInput" 
+                           placeholder="여행지명으로 검색...">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-success w-100" onclick="searchDestinations()">
+                    <i class="fas fa-search"></i> 검색
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 여행지 목록 -->
+<div class="row" id="destinationsList">
+    <!-- 샘플 여행지 데이터 -->
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card travel-card h-100">
+            <img src="https://via.placeholder.com/400x200?text=Pet+Friendly+Resort" 
+                 class="card-img-top" alt="애견 펜션" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title">강아지와 함께하는 펜션</h6>
+                    <span class="badge bg-primary">🏠 펜션</span>
+                </div>
+                <p class="text-muted small mb-2">
+                    <i class="fas fa-map-marker-alt"></i> 강원도 춘천시
+                </p>
+                <p class="card-text small mb-3">
+                    넓은 마당과 산책로가 있는 반려동물 전용 펜션입니다. 
+                    자연 속에서 반려동물과 함께 힐링하세요.
+                </p>
+                
+                <div class="mb-3">
+                    <h6 class="small text-success">반려동물 편의시설</h6>
+                    <div class="d-flex flex-wrap gap-1">
+                        <span class="badge bg-light text-dark">전용 마당</span>
+                        <span class="badge bg-light text-dark">산책로</span>
+                        <span class="badge bg-light text-dark">목욕시설</span>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">1박 8만원~</small>
+                    <button class="btn btn-sm btn-success" onclick="viewDestination(1)">
+                        자세히 보기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card travel-card h-100">
+            <img src="https://via.placeholder.com/400x200?text=Pet+Camping" 
+                 class="card-img-top" alt="애견 캠핑장" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title">반려동물 캠핑장</h6>
+                    <span class="badge bg-warning">🏕️ 캠핑</span>
+                </div>
+                <p class="text-muted small mb-2">
+                    <i class="fas fa-map-marker-alt"></i> 경기도 가평군
+                </p>
+                <p class="card-text small mb-3">
+                    반려동물과 함께 즐기는 캠핑! 전용 운동장과 
+                    수영장이 있어 더욱 특별한 경험을 제공합니다.
+                </p>
+                
+                <div class="mb-3">
+                    <h6 class="small text-success">반려동물 편의시설</h6>
+                    <div class="d-flex flex-wrap gap-1">
+                        <span class="badge bg-light text-dark">운동장</span>
+                        <span class="badge bg-light text-dark">수영장</span>
+                        <span class="badge bg-light text-dark">놀이시설</span>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">1박 5만원~</small>
+                    <button class="btn btn-sm btn-success" onclick="viewDestination(2)">
+                        자세히 보기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card travel-card h-100">
+            <img src="https://via.placeholder.com/400x200?text=Jeju+Pet+Resort" 
+                 class="card-img-top" alt="제주 리조트" style="height: 200px; object-fit: cover;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="card-title">제주 펫 리조트</h6>
+                    <span class="badge bg-info">🏖️ 리조트</span>
+                </div>
+                <p class="text-muted small mb-2">
+                    <i class="fas fa-map-marker-alt"></i> 제주특별자치도
+                </p>
+                <p class="card-text small mb-3">
+                    제주의 아름다운 바다와 함께하는 펫 리조트. 
+                    반려동물 전용 비치와 스파가 있습니다.
+                </p>
+                
+                <div class="mb-3">
+                    <h6 class="small text-success">반려동물 편의시설</h6>
+                    <div class="d-flex flex-wrap gap-1">
+                        <span class="badge bg-light text-dark">전용 비치</span>
+                        <span class="badge bg-light text-dark">펫 스파</span>
+                        <span class="badge bg-light text-dark">24h 케어</span>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">1박 15만원~</small>
+                    <button class="btn btn-sm btn-success" onclick="viewDestination(3)">
+                        자세히 보기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 여행 팁 -->
+<div class="card mt-4">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-lightbulb text-warning"></i> 반려동물 여행 팁</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-success">✅ 여행 전 준비사항</h6>
+                <ul class="small">
+                    <li>예방접종 완료 확인</li>
+                    <li>건강검진 받기</li>
+                    <li>여행용품 준비</li>
+                    <li>숙소 반려동물 정책 확인</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-info">💡 여행 중 주의사항</h6>
+                <ul class="small">
+                    <li>충분한 물과 사료 준비</li>
+                    <li>안전벨트 또는 캐리어 사용</li>
+                    <li>정기적인 휴식 시간</li>
+                    <li>응급상황 대비 병원 정보</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function searchDestinations() {
+    const region = document.getElementById('regionFilter').value;
+    const type = document.getElementById('typeFilter').value;
+    const keyword = document.getElementById('searchInput').value;
+    
+    alert(`검색 기능은 추후 구현 예정입니다.\n지역: ${region || '전체'}\n유형: ${type || '전체'}\n키워드: ${keyword || '없음'}`);
+}
+
+function viewDestination(destinationId) {
+    alert('여행지 상세보기 기능은 추후 구현 예정입니다.');
+}
+
+// 카드 hover 효과
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.travel-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            const img = this.querySelector('img');
+            if (img) {
+                img.style.transform = 'scale(1.05)';
+            }
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            const img = this.querySelector('img');
+            if (img) {
+                img.style.transform = 'scale(1)';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

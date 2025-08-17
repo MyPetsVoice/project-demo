@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section bg-gradient text-white py-5 mb-5 rounded">
+    <div class="text-center">
+        <h1 class="display-4 mb-3"><i class="fas fa-paw"></i> PetCare</h1>
+        <p class="lead">AI 기반 반려동물 종합 케어 서비스</p>
+        <p class="mb-4">반려동물과의 소중한 일상을 기록하고, AI 친구와 대화하며, 건강관리까지!</p>
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">지금 시작하기</a>
+        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">로그인</a>
+        {% else %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-light btn-lg">대시보드로 이동</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-robot fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">AI 반려동물 채팅</h5>
+                <p class="card-text">반려동물의 개성을 반영한 AI와 실시간 대화를 나누세요. 마치 진짜 반려동물과 대화하는 것 같은 경험!</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-book fa-3x text-success mb-3"></i>
+                <h5 class="card-title">AI 일기 작성</h5>
+                <p class="card-text">반려동물의 관점에서 하루를 기록하는 특별한 일기. AI가 도와주는 감동적인 스토리텔링!</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 text-center">
+            <div class="card-body">
+                <i class="fas fa-heart fa-3x text-danger mb-3"></i>
+                <h5 class="card-title">건강 케어</h5>
+                <p class="card-text">반려동물의 건강 기록, 루틴 관리, 병원 예약까지. 체계적인 건강 관리 시스템!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <h3><i class="fas fa-star text-warning"></i> 인기 반려동물 일기</h3>
+        {% if popular_diaries %}
+        <div class="row">
+            {% for diary in popular_diaries[:3] %}
+            <div class="col-12 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ diary.title }}</h6>
+                        <p class="card-text text-muted small">{{ diary.pet.name }} • {{ diary.created_at.strftime('%Y.%m.%d') }}</p>
+                        <p class="card-text">{{ diary.content[:100] }}...</p>
+                        <small class="text-muted">
+                            <i class="fas fa-heart"></i> {{ diary.likes }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center text-muted">
+                <p>아직 공개된 일기가 없어요. 첫 번째 일기를 작성해보세요!</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <h3><i class="fas fa-comments text-info"></i> 인기 커뮤니티 게시글</h3>
+        {% if popular_posts %}
+        <div class="row">
+            {% for post in popular_posts[:3] %}
+            <div class="col-12 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">{{ post.title }}</h6>
+                        <p class="card-text text-muted small">{{ post.author.nickname }} • {{ post.created_at.strftime('%Y.%m.%d') }}</p>
+                        <p class="card-text">{{ post.content[:100] }}...</p>
+                        <small class="text-muted">
+                            <i class="fas fa-heart"></i> {{ post.likes }}
+                            <i class="fas fa-eye ms-2"></i> {{ post.views }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body text-center text-muted">
+                <p>커뮤니티에 첫 번째 글을 작성해보세요!</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="text-center mt-5">
+    <h3>반려동물과 함께하는 특별한 순간들</h3>
+    <p class="text-muted">PetCare와 함께 더욱 풍성한 반려동물 라이프를 경험해보세요.</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 간단한 애니메이션 효과
+document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100);
+        }, index * 100);
+    });
+});
+</script>
+{% endblock %}

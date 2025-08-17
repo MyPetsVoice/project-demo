@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+
+{% block title %}커뮤니티 - PetCare{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-comments text-info"></i> 커뮤니티</h2>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('write_post') }}" class="btn btn-info">
+        <i class="fas fa-edit"></i> 새 글 작성
+    </a>
+    {% endif %}
+</div>
+
+<!-- 인기 태그 및 필터 -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h6 class="mb-2">인기 태그</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-primary tag-filter" data-tag="all">전체</span>
+                    <span class="badge bg-outline-secondary tag-filter" data-tag="산책해요">산책해요</span>
+                    <span class="badge bg-outline-secondary tag-filter" data-tag="꿀팁">꿀팁</span>
+                    <span class="badge bg-outline-secondary tag-filter" data-tag="질문">질문</span>
+                    <span class="badge bg-outline-secondary tag-filter" data-tag="자랑">자랑</span>
+                    <span class="badge bg-outline-secondary tag-filter" data-tag="병원">병원</span>
+                    <span class="badge bg-outline-secondary tag-filter" data-tag="훈련">훈련</span>
+                    <span class="badge bg-outline-secondary tag-filter" data-tag="간식">간식</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" class="form-control" id="searchInput" 
+                           placeholder="제목이나 내용으로 검색...">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 정렬 옵션 -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center">
+        <span class="text-muted me-3">총 <strong id="postCount">{{ posts|length }}</strong>개의 게시글</span>
+        <span class="badge bg-info" id="activeFilter">전체</span>
+    </div>
+    <select class="form-select" id="sortSelect" style="width: auto;">
+        <option value="latest">최신순</option>
+        <option value="popular">인기순</option>
+        <option value="comments">댓글많은순</option>
+        <option value="views">조회수순</option>
+    </select>
+</div>
+
+<!-- 게시글 목록 -->
+<div id="postsContainer">
+    {% if posts %}
+        {% for post in posts %}
+        <div class="card mb-3 post-item" 
+             data-tag="{{ post.tag|lower }}" 
+             data-title="{{ post.title|lower }}"
+             data-content="{{ post.content|lower }}"
+             data-likes="{{ post.likes }}"
+             data-views="{{ post.views }}"
+             data-comments="{{ post.comments|length }}"
+             data-date="{{ post.created_at.isoformat() }}">
+            
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 me-3">
+                            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" 
+                                 style="width: 40px; height: 40px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">{{ post.author.nickname }}</h6>
+                            <small class="text-muted">
+                                {{ post.created_at.strftime('%Y.%m.%d %H:%M') }}
+                                {% if post.tag %}
+                                • <span class="badge bg-secondary">{{ post.tag }}</span>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    {% if current_user.is_authenticated and current_user.id == post.user_id %}
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="editPost({{ post.id }})">
+                                <i class="fas fa-edit"></i> 수정
+                            </a></li>
+                            <li><a class="dropdown-item text-danger" href="#" onclick="deletePost({{ post.id }}, '{{ post.title }}')">
+                                <i class="fas fa-trash"></i> 삭제
+                            </a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <h5 class="card-title">{{ post.title }}</h5>
+                <p class="card-text">{{ post.content[:200] }}{% if post.content|length > 200 %}...{% endif %}</p>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        {% if current_user.is_authenticated %}
+                        <button class="btn btn-sm btn-outline-danger like-btn" onclick="toggleLike('post', {{ post.id }})">
+                            <i class="far fa-heart"></i> <span class="like-count">{{ post.likes }}</span>
+                        </button>
+                        {% else %}
+                        <span class="text-muted">
+                            <i class="far fa-heart"></i> {{ post.likes }}
+                        </span>
+                        {% endif %}
+                        
+                        <span class="text-muted">
+                            <i class="fas fa-comment"></i> {{ post.comments|length }}
+                        </span>
+                        
+                        <span class="text-muted">
+                            <i class="fas fa-eye"></i> {{ post.views }}
+                        </span>
+                    </div>
+                    
+                    <button class="btn btn-sm btn-info" onclick="viewPost({{ post.id }})">
+                        <i class="fas fa-eye"></i> 자세히 보기
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-comments fa-4x text-muted mb-4"></i>
+        <h3 class="text-muted">아직 게시글이 없어요</h3>
+        <p class="text-muted mb-4">첫 번째 게시글을 작성해보세요!</p>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('write_post') }}" class="btn btn-info btn-lg">
+            <i class="fas fa-edit"></i> 첫 번째 글 작성하기
+        </a>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-sign-in-alt"></i> 로그인하고 글 작성하기
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- 검색 결과가 없을 때 -->
+<div id="noResultsMessage" class="text-center py-5 d-none">
+    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+    <h5 class="text-muted">검색 결과가 없습니다</h5>
+    <p class="text-muted">다른 키워드나 태그로 검색해보세요.</p>
+</div>
+
+<!-- 무한 스크롤 로딩 -->
+<div id="loadingMore" class="text-center py-4 d-none">
+    <div class="loading-spinner"></div>
+    <p class="mt-2 text-muted">더 많은 게시글을 불러오는 중...</p>
+</div>
+
+<!-- 게시글 상세보기 모달 -->
+<div class="modal fade" id="postDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="postDetailTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="postDetailContent">
+                <!-- 동적으로 로드될 내용 -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-info" onclick="goToPostDetail()">상세 페이지로</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentFilter = 'all';
+let currentPostId = null;
+
+// 태그 필터
+document.querySelectorAll('.tag-filter').forEach(tag => {
+    tag.addEventListener('click', function() {
+        // 이전 활성 태그 제거
+        document.querySelectorAll('.tag-filter').forEach(t => {
+            t.classList.remove('bg-primary');
+            t.classList.add('bg-outline-secondary');
+        });
+        
+        // 현재 태그 활성화
+        this.classList.remove('bg-outline-secondary');
+        this.classList.add('bg-primary');
+        
+        currentFilter = this.getAttribute('data-tag');
+        document.getElementById('activeFilter').textContent = this.textContent;
+        
+        filterAndSortPosts();
+    });
+});
+
+// 검색
+document.getElementById('searchInput').addEventListener('input', PetCare.debounce(function() {
+    filterAndSortPosts();
+}, 300));
+
+// 정렬
+document.getElementById('sortSelect').addEventListener('change', function() {
+    filterAndSortPosts();
+});
+
+function filterAndSortPosts() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const sortBy = document.getElementById('sortSelect').value;
+    
+    const postItems = Array.from(document.querySelectorAll('.post-item'));
+    let visibleCount = 0;
+    
+    // 필터링
+    postItems.forEach(item => {
+        const tag = item.getAttribute('data-tag');
+        const title = item.getAttribute('data-title');
+        const content = item.getAttribute('data-content');
+        
+        let showItem = true;
+        
+        // 태그 필터
+        if (currentFilter !== 'all' && tag !== currentFilter.toLowerCase()) {
+            showItem = false;
+        }
+        
+        // 검색어 필터
+        if (searchTerm && !title.includes(searchTerm) && !content.includes(searchTerm)) {
+            showItem = false;
+        }
+        
+        if (showItem) {
+            item.style.display = 'block';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    // 정렬
+    const visibleItems = postItems.filter(item => item.style.display !== 'none');
+    visibleItems.sort((a, b) => {
+        if (sortBy === 'latest') {
+            return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+        } else if (sortBy === 'popular') {
+            return parseInt(b.getAttribute('data-likes')) - parseInt(a.getAttribute('data-likes'));
+        } else if (sortBy === 'comments') {
+            return parseInt(b.getAttribute('data-comments')) - parseInt(a.getAttribute('data-comments'));
+        } else if (sortBy === 'views') {
+            return parseInt(b.getAttribute('data-views')) - parseInt(a.getAttribute('data-views'));
+        }
+    });
+    
+    // DOM 재배치
+    const container = document.getElementById('postsContainer');
+    visibleItems.forEach(item => {
+        container.appendChild(item);
+    });
+    
+    // 게시글 수 업데이트
+    document.getElementById('postCount').textContent = visibleCount;
+    
+    // 검색 결과 없음 메시지
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    if (visibleCount === 0) {
+        noResultsMessage.classList.remove('d-none');
+        container.style.display = 'none';
+    } else {
+        noResultsMessage.classList.add('d-none');
+        container.style.display = 'block';
+    }
+}
+
+function viewPost(postId) {
+    currentPostId = postId;
+    
+    // 실제로는 API를 호출해서 게시글 상세 정보를 가져와야 함
+    const modal = new bootstrap.Modal(document.getElementById('postDetailModal'));
+    document.getElementById('postDetailTitle').textContent = '게시글 제목';
+    document.getElementById('postDetailContent').innerHTML = `
+        <div class="mb-3">
+            <div class="d-flex align-items-center mb-2">
+                <div class="bg-info rounded-circle d-flex align-items-center justify-content-center me-3" 
+                     style="width: 40px; height: 40px;">
+                    <i class="fas fa-user text-white"></i>
+                </div>
+                <div>
+                    <h6 class="mb-0">사용자 닉네임</h6>
+                    <small class="text-muted">2024.01.15 14:30</small>
+                </div>
+            </div>
+            <span class="badge bg-secondary">꿀팁</span>
+        </div>
+        
+        <div class="mb-4">
+            <p>게시글 내용이 여기에 표시됩니다. 실제로는 API를 통해 가져온 데이터가 표시될 예정입니다.</p>
+            <p>반려동물과 관련된 다양한 정보와 팁들을 공유할 수 있는 공간입니다.</p>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-3">
+                <span><i class="fas fa-heart text-danger"></i> 15</span>
+                <span><i class="fas fa-comment text-info"></i> 8</span>
+                <span><i class="fas fa-eye text-muted"></i> 127</span>
+            </div>
+            <small class="text-muted">더 자세한 내용은 상세 페이지에서 확인하세요</small>
+        </div>
+    `;
+    modal.show();
+}
+
+function editPost(postId) {
+    alert('게시글 수정 기능은 추후 구현 예정입니다.');
+}
+
+function deletePost(postId, title) {
+    if (confirm(`정말로 "${title}" 게시글을 삭제하시겠습니까?`)) {
+        alert('게시글 삭제 기능은 추후 구현 예정입니다.');
+    }
+}
+
+function goToPostDetail() {
+    if (currentPostId) {
+        // 실제로는 게시글 상세 페이지로 이동
+        alert('게시글 상세 페이지 기능은 추후 구현 예정입니다.');
+    }
+}
+
+function toggleLike(type, id) {
+    PetCare.toggleLike(type, id);
+}
+
+// 무한 스크롤 구현
+PetCare.setupInfiniteScroll(async function() {
+    const loadingMore = document.getElementById('loadingMore');
+    loadingMore.classList.remove('d-none');
+    
+    // 실제로는 다음 페이지 데이터를 로드
+    setTimeout(() => {
+        loadingMore.classList.add('d-none');
+    }, 1000);
+});
+
+// 페이지 로드 시 초기 정렬 적용
+document.addEventListener('DOMContentLoaded', function() {
+    filterAndSortPosts();
+});
+</script>
+{% endblock %}
